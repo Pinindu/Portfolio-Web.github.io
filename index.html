@@ -54,29 +54,79 @@ img { display: block; }
 
 /* ─── LOADER ─── */
 #loader {
-  position: fixed; inset: 0; background: #0e0e0e; z-index: 10000;
+  position: fixed; inset: 0; background: #0a0a0a; z-index: 10000;
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 2rem;
-  transition: opacity .7s ease, visibility .7s;
+  align-items: center; justify-content: center; gap: 0;
+  transition: opacity .9s ease, visibility .9s;
+  overflow: hidden;
 }
 #loader.out { opacity: 0; visibility: hidden; pointer-events: none; }
+/* loader grid bg */
+#loader::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  animation: loaderGrid 1.2s ease forwards;
+  opacity: 0;
+}
+@keyframes loaderGrid { to { opacity: 1; } }
+/* loader glow */
+#loader::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(201,160,64,.08) 0%, transparent 70%);
+  pointer-events: none;
+  animation: loaderGlow 2s ease-in-out infinite;
+}
+@keyframes loaderGlow {
+  0%,100% { opacity: .5; transform: translate(-50%,-50%) scale(1); }
+  50%      { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+}
+.ld-eyebrow {
+  font-family: var(--cond); font-size: .6rem; font-weight: 700;
+  letter-spacing: .35em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.8rem;
+  display: flex; align-items: center; gap: .8rem;
+  opacity: 0; animation: fadein .5s ease .1s forwards;
+  position: relative; z-index: 1;
+}
+.ld-eyebrow::before, .ld-eyebrow::after {
+  content: ''; width: 28px; height: 1px; background: var(--gold); opacity: .5;
+}
 .ld-name {
   font-family: var(--cond); font-weight: 700;
-  font-size: clamp(2.5rem,6vw,5rem); letter-spacing: .12em;
+  font-size: clamp(2.5rem,6vw,5.5rem); letter-spacing: .12em;
   text-transform: uppercase; color: var(--white);
+  position: relative; z-index: 1;
+  opacity: 0; animation: fadein .7s cubic-bezier(.16,1,.3,1) .2s forwards;
 }
 .ld-name span { color: var(--gold); }
+.ld-tagline {
+  font-family: var(--cond); font-size: .72rem; font-weight: 400;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--mid);
+  margin-top: .7rem; margin-bottom: 2.5rem;
+  opacity: 0; animation: fadein .5s ease .5s forwards;
+  position: relative; z-index: 1;
+}
 .ld-track {
-  width: 200px; height: 1px; background: var(--muted); position: relative;
+  width: 240px; height: 1px; background: rgba(255,255,255,.08);
+  position: relative; z-index: 1;
 }
 .ld-fill {
   position: absolute; left: 0; top: 0; height: 100%;
-  background: var(--gold); width: 0;
-  transition: width 1s cubic-bezier(.16,1,.3,1);
+  background: linear-gradient(90deg, var(--gold), #e8d090);
+  width: 0; transition: width .08s linear;
+  box-shadow: 0 0 12px rgba(201,160,64,.6);
 }
 .ld-pct {
-  font-family: var(--cond); font-size: .75rem; letter-spacing: .2em;
+  font-family: var(--cond); font-size: .7rem; letter-spacing: .22em;
   color: var(--muted); text-transform: uppercase;
+  margin-top: 1rem; position: relative; z-index: 1;
 }
 
 /* ─── SIDEBAR (left vertical strip like Aer) ─── */
@@ -97,15 +147,42 @@ img { display: block; }
 }
 .sb-socials {
   display: flex; flex-direction: column;
-  align-items: center; gap: 1.8rem;
+  align-items: center; gap: 1.4rem;
 }
 .sb-s {
-  font-family: var(--cond); font-size: .65rem; font-weight: 600;
-  letter-spacing: .15em; text-transform: uppercase;
-  color: var(--muted); writing-mode: vertical-rl;
-  transform: rotate(180deg); transition: color .2s;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid transparent; border-radius: 6px;
+  color: var(--muted); transition: color .25s, border-color .25s, background .25s, transform .25s;
+  position: relative;
 }
-.sb-s:hover { color: var(--gold); }
+.sb-s svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform .25s;
+}
+.sb-s:hover {
+  color: var(--gold);
+  border-color: rgba(201,160,64,.3);
+  background: rgba(201,160,64,.06);
+  transform: translateX(2px);
+}
+.sb-s:hover svg { transform: scale(1.12); }
+/* tooltip */
+.sb-s::after {
+  content: attr(data-label);
+  position: absolute; left: calc(100% + 12px); top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  font-family: var(--cond); font-size: .6rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold); background: var(--panel);
+  border: 1px solid rgba(201,160,64,.25);
+  padding: .3rem .7rem; border-radius: 3px;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .2s, transform .2s;
+}
+.sb-s:hover::after { opacity: 1; transform: translateY(-50%) translateX(0); }
 .sb-num {
   font-family: var(--cond); font-size: .7rem; letter-spacing: .1em;
   color: var(--muted);
@@ -149,9 +226,26 @@ nav.scrolled {
   letter-spacing: .14em; text-transform: uppercase;
   color: var(--bg); background: var(--gold);
   padding: .5rem 1.4rem; border-radius: 2px;
-  transition: opacity .2s;
+  display: inline-flex; align-items: center; gap: .5rem;
+  position: relative; overflow: hidden;
+  transition: box-shadow .25s, transform .25s;
 }
-.nav-cta:hover { opacity: .85; }
+.nav-cta::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+  transform: translateX(-100%);
+  transition: transform .5s;
+}
+.nav-cta:hover::before { transform: translateX(100%); }
+.nav-cta:hover { box-shadow: 0 6px 24px rgba(201,160,64,.35); transform: translateY(-1px); }
+.nav-cta svg {
+  width: 13px; height: 13px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform .25s;
+}
+.nav-cta:hover svg { transform: translate(2px,-2px); }
 
 /* ─── SCROLL PROGRESS ─── */
 #prog {
@@ -177,7 +271,7 @@ nav.scrolled {
   display: flex; flex-direction: column;
   justify-content: flex-end;
   padding: 2rem 1.8rem 3rem;
-  position: relative; z-index: 2;
+  position: relative; z-index: 4;
 }
 .hero-index {
   font-family: var(--cond); font-weight: 300;
@@ -219,10 +313,231 @@ nav.scrolled {
   background: radial-gradient(ellipse, rgba(201,160,64,.06) 0%, transparent 65%);
   pointer-events: none;
 }
+#hero-canvas {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none; opacity: 1;
+  width: 100%; height: 100%;
+}
+
+/* ─── FLOATING ORBS (global background life) ─── */
+.orb {
+  position: fixed; border-radius: 50%; pointer-events: none;
+  filter: blur(80px); z-index: 0; animation: orbFloat linear infinite;
+  mix-blend-mode: screen;
+}
+.orb-1 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(201,160,64,.09) 0%, transparent 70%);
+  top: -80px; right: 10%;
+  animation-duration: 22s; animation-delay: 0s;
+}
+.orb-2 {
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(100,60,180,.07) 0%, transparent 70%);
+  bottom: 20%; left: 5%;
+  animation-duration: 30s; animation-delay: -8s;
+}
+.orb-3 {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(201,160,64,.05) 0%, transparent 70%);
+  top: 50%; right: 5%;
+  animation-duration: 18s; animation-delay: -14s;
+}
+@keyframes orbFloat {
+  0%   { transform: translate(0,0) scale(1); }
+  25%  { transform: translate(30px,-40px) scale(1.05); }
+  50%  { transform: translate(-20px, 30px) scale(.95); }
+  75%  { transform: translate(40px, 10px) scale(1.03); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+/* ─── BEHANCE SECTION ─── */
+#behance { margin-left: 56px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+.behance-layout {
+  display: grid; grid-template-columns: 220px 1fr;
+}
+.behance-col-left {
+  background: var(--panel); border-right: 1px solid var(--line);
+  padding: 4rem 1.8rem;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.bcl-num {
+  font-family: var(--cond); font-size: 4rem; font-weight: 700;
+  color: rgba(255,255,255,.04); line-height: 1;
+}
+.bcl-title {
+  font-family: var(--cond); font-weight: 700; font-size: .72rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--mid);
+  margin-top: .8rem;
+}
+.behance-main {
+  padding: 0; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+/* animated gradient stripe */
+.behance-main::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(120deg,
+    rgba(201,160,64,.04) 0%,
+    rgba(201,160,64,.09) 30%,
+    rgba(80,40,160,.05) 60%,
+    transparent 100%
+  );
+  background-size: 300% 300%;
+  animation: bShift 8s ease infinite;
+  pointer-events: none; z-index: 0;
+}
+@keyframes bShift {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+/* grid overlay */
+.behance-main::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.behance-inner {
+  position: relative; z-index: 2;
+  padding: 6rem 4rem;
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+.behance-kicker {
+  font-family: var(--cond); font-size: .68rem; font-weight: 700;
+  letter-spacing: .28em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 1.4rem; display: flex; align-items: center; gap: .8rem;
+}
+.behance-kicker::before { content: ''; width: 24px; height: 1px; background: var(--gold); }
+.behance-headline {
+  font-size: clamp(2.2rem, 5vw, 5.5rem); font-weight: 900;
+  color: var(--white); letter-spacing: -.03em; line-height: .92;
+  text-transform: uppercase; margin-bottom: 1.6rem;
+}
+.behance-headline .ghost {
+  -webkit-text-stroke: 1px rgba(255,255,255,.18);
+  color: transparent;
+}
+.behance-headline .gold { color: var(--gold); }
+.behance-sub {
+  font-size: 1rem; color: var(--mid); line-height: 1.75;
+  max-width: 520px; margin-bottom: 3rem;
+}
+.behance-sub strong { color: var(--text); font-weight: 500; }
+
+/* pill counter row */
+.behance-pills {
+  display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3.5rem;
+}
+.behance-pill {
+  font-family: var(--cond); font-size: .62rem; font-weight: 700;
+  letter-spacing: .15em; text-transform: uppercase;
+  padding: .4rem 1rem; border-radius: 2px;
+  border: 1px solid var(--line); color: var(--mid);
+  display: flex; align-items: center; gap: .5rem;
+  transition: all .25s;
+}
+.behance-pill:hover { color: var(--gold); border-color: rgba(201,160,64,.4); }
+.behance-pill .bpill-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
+  animation: pulse 2.5s infinite;
+}
+
+/* CTA button */
+.behance-cta {
+  display: inline-flex; align-items: center; gap: 1rem;
+  font-family: var(--cond); font-size: .78rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--bg); background: var(--gold);
+  padding: 1rem 2.2rem; border-radius: 2px; position: relative;
+  overflow: hidden; transition: transform .3s, box-shadow .3s;
+}
+.behance-cta::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform .6s cubic-bezier(.16,1,.3,1);
+}
+.behance-cta:hover::before { transform: translateX(100%); }
+.behance-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(201,160,64,.35);
+}
+.behance-cta-arrow {
+  font-size: 1.1rem; transition: transform .3s;
+}
+.behance-cta:hover .behance-cta-arrow { transform: translate(3px,-3px); }
+
+/* secondary ghost link */
+.behance-ghost {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-family: var(--cond); font-size: .7rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mid); margin-left: 1.5rem;
+  border-bottom: 1px solid var(--line); padding-bottom: .3rem;
+  transition: color .25s, border-color .25s;
+}
+.behance-ghost:hover { color: var(--gold); border-color: rgba(201,160,64,.5); }
+
+/* floating Behance "B" watermark */
+.behance-watermark {
+  position: absolute; right: -20px; bottom: -40px; z-index: 1;
+  font-family: var(--cond); font-weight: 900; font-size: 22rem;
+  color: rgba(201,160,64,.025); line-height: 1; pointer-events: none;
+  letter-spacing: -.05em; user-select: none;
+  animation: wmarkDrift 12s ease-in-out infinite;
+}
+@keyframes wmarkDrift {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-18px) rotate(-1deg); }
+}
+
+/* preview strip of small case study thumbnails */
+.behance-strip {
+  display: flex; gap: 0; overflow: hidden;
+  border-top: 1px solid var(--line); margin-top: auto;
+}
+.behance-thumb {
+  flex: 1; height: 160px; overflow: hidden; position: relative;
+  border-right: 1px solid var(--line);
+}
+.behance-thumb:last-child { border-right: none; }
+.behance-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(.55) saturate(.5) contrast(1.1);
+  transition: filter .5s, transform .5s;
+}
+.behance-thumb:hover img {
+  filter: brightness(.9) saturate(1) contrast(1);
+  transform: scale(1.06);
+}
+.behance-thumb-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: .6rem .8rem;
+  font-family: var(--cond); font-size: .58rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold); background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
+  opacity: 0; transform: translateY(4px); transition: all .3s;
+}
+.behance-thumb:hover .behance-thumb-label { opacity: 1; transform: translateY(0); }
+
+@media(max-width:960px) {
+  #behance { margin-left: 0; }
+  .behance-layout { grid-template-columns: 1fr; }
+  .behance-col-left { display: none; }
+  .behance-inner { padding: 3rem 1.5rem; }
+  .behance-headline { font-size: clamp(2rem,10vw,3.5rem); }
+  .behance-watermark { font-size: 10rem; }
+  .behance-strip { display: none; }
+  .behance-ghost { display: none; }
+}
 
 /* hero right: main content */
 .hero-right {
-  position: relative; z-index: 2;
+  position: relative; z-index: 4;
   display: flex; flex-direction: column;
   justify-content: flex-end;
   padding: 8rem 3rem 0;
@@ -278,20 +593,36 @@ nav.scrolled {
 .ticker-bar {
   margin-left: 56px;
   background: var(--panel); border-top: 1px solid var(--line);
-  overflow: hidden; padding: .8rem 0;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden; padding: 0;
 }
+.ticker-row {
+  overflow: hidden; padding: .65rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.ticker-row:last-child { border-bottom: none; }
 .ticker-track {
   display: flex; gap: 0; width: max-content;
-  animation: ticker 28s linear infinite;
+  animation: ticker 32s linear infinite;
 }
+.ticker-row:nth-child(2) .ticker-track {
+  animation: tickerRev 38s linear infinite;
+}
+.ticker-bar:hover .ticker-track { animation-play-state: paused; }
 .ticker-item {
-  font-family: var(--cond); font-size: .65rem; font-weight: 600;
+  font-family: var(--cond); font-size: .63rem; font-weight: 600;
   letter-spacing: .2em; text-transform: uppercase;
-  color: var(--muted); white-space: nowrap; padding: 0 2rem;
-  border-right: 1px solid var(--line);
+  color: var(--muted); white-space: nowrap; padding: 0 1.6rem;
+  display: flex; align-items: center; gap: .7rem;
+  transition: color .2s;
 }
-.ticker-item .dot { color: var(--gold); margin-right: .5rem; }
-@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.ticker-item:hover { color: var(--white); }
+.ticker-item .tick-div {
+  width: 6px; height: 6px; flex-shrink: 0;
+  stroke: var(--gold); fill: var(--gold); opacity: .5;
+}
+@keyframes ticker    { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@keyframes tickerRev { from{transform:translateX(-50%)} to{transform:translateX(0)} }
 
 /* ─── ABOUT ─── */
 #about { margin-left: 56px; border-bottom: 1px solid var(--line); }
@@ -335,22 +666,36 @@ nav.scrolled {
   display: flex; flex-direction: column;
 }
 .astat {
-  flex: 1; padding: 2.5rem 2rem;
+  flex: 1; padding: 2.2rem 2rem;
   border-bottom: 1px solid var(--line);
   display: flex; flex-direction: column; justify-content: center;
-  transition: background .3s;
+  transition: background .3s; position: relative; overflow: hidden;
 }
-.astat:hover { background: rgba(201,160,64,.03); }
+.astat::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--gold); opacity: 0;
+  transition: opacity .3s;
+}
+.astat:hover::before { opacity: 1; }
+.astat:hover { background: rgba(201,160,64,.04); }
 .astat:last-child { border-bottom: none; }
+.astat-icon {
+  width: 28px; height: 28px; margin-bottom: .7rem;
+  stroke: rgba(201,160,64,.4); fill: none;
+  stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  transition: stroke .3s;
+}
+.astat:hover .astat-icon { stroke: rgba(201,160,64,.7); }
 .astat-num {
-  font-family: var(--cond); font-size: 3.5rem; font-weight: 700;
+  font-family: var(--cond); font-size: 3.2rem; font-weight: 700;
   color: var(--white); line-height: 1;
 }
-.astat-num sup { font-size: 1.4rem; color: var(--gold); vertical-align: super; }
+.astat-num sup { font-size: 1.3rem; color: var(--gold); vertical-align: super; }
 .astat-label {
-  font-family: var(--cond); font-size: .65rem; font-weight: 600;
+  font-family: var(--cond); font-size: .6rem; font-weight: 600;
   letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
-  margin-top: .5rem;
+  margin-top: .4rem;
 }
 
 /* ─── EXPERIENCE ─── */
@@ -392,21 +737,44 @@ nav.scrolled {
   padding: 2rem 0; border-bottom: 1px solid var(--line);
   opacity: 0; transform: translateX(-16px);
   transition: opacity .55s, transform .55s;
+  position: relative; cursor: default;
 }
 .exp-row.in { opacity: 1; transform: translateX(0); }
 .exp-row:first-of-type { border-top: 1px solid var(--line); }
+/* hover gold left bar */
+.exp-row::before {
+  content: '';
+  position: absolute; left: -1px; top: 0; bottom: 0; width: 2px;
+  background: var(--gold); opacity: 0; transition: opacity .3s;
+}
+.exp-row:hover::before { opacity: 1; }
 .exp-n {
   font-family: var(--cond); font-size: 1.8rem; font-weight: 700;
   color: rgba(255,255,255,.06); line-height: 1; padding-top: .15rem;
   transition: color .3s;
 }
 .exp-row:hover .exp-n { color: rgba(201,160,64,.18); }
-.exp-role { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .25rem; }
+.exp-role { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .3rem; display: flex; align-items: center; gap: .6rem; }
+.exp-role-link {
+  width: 14px; height: 14px; opacity: 0;
+  stroke: var(--gold); fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity .25s, transform .25s;
+  flex-shrink: 0;
+  transform: translateX(-4px);
+}
+.exp-row:hover .exp-role-link { opacity: 1; transform: translateX(0); }
 .exp-co {
   font-family: var(--cond); font-size: .75rem; font-weight: 500;
   letter-spacing: .08em; text-transform: uppercase; color: var(--mid);
+  display: flex; align-items: center; gap: .4rem;
 }
-.exp-loc { color: var(--muted); }
+.exp-pin {
+  width: 11px; height: 11px; flex-shrink: 0;
+  stroke: var(--muted); fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.exp-loc { color: var(--muted); font-weight: 400; }
 .exp-r { text-align: right; }
 .exp-period {
   font-family: var(--cond); font-size: .68rem; font-weight: 500;
@@ -490,7 +858,12 @@ nav.scrolled {
 .wcard-img-fallback {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.5rem; background: #111;
+  background: linear-gradient(135deg, #0e0e0e 0%, #161616 100%);
+}
+.wcard-img-fallback svg {
+  width: 40px; height: 40px;
+  stroke: rgba(201,160,64,.35); fill: none;
+  stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round;
 }
 .wcard-overlay {
   position: absolute; inset: 0;
@@ -510,10 +883,22 @@ nav.scrolled {
   letter-spacing: .14em; text-transform: uppercase; color: var(--gold);
 }
 .wcard-arrow {
-  font-size: .9rem; color: var(--muted);
-  transition: transform .3s, color .3s;
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--line); flex-shrink: 0;
+  transition: background .3s, border-color .3s, transform .3s;
 }
-.wcard:hover .wcard-arrow { transform: translate(3px,-3px); color: var(--gold); }
+.wcard-arrow svg {
+  width: 12px; height: 12px;
+  stroke: var(--muted); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: stroke .3s, transform .3s;
+}
+.wcard:hover .wcard-arrow {
+  background: var(--gold); border-color: var(--gold);
+  transform: rotate(45deg);
+}
+.wcard:hover .wcard-arrow svg { stroke: var(--bg); transform: none; }
 .wcard-title { font-size: .95rem; font-weight: 700; color: var(--white); margin-bottom: .4rem; }
 .wcard-desc { font-size: .78rem; color: var(--mid); line-height: 1.6; }
 
@@ -565,7 +950,42 @@ nav.scrolled {
   line-height: 1; margin-bottom: 1.2rem; transition: color .3s;
 }
 .pstep:hover .pstep-n { color: rgba(201,160,64,.12); }
-.pstep-icon { font-size: 1.4rem; margin-bottom: .8rem; }
+.pstep-icon {
+  width: 48px; height: 48px;
+  margin-bottom: 1.2rem;
+  border: 1px solid rgba(201,160,64,.2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(201,160,64,.08) 0%, rgba(201,160,64,.02) 100%);
+  transition: border-color .3s, background .3s, box-shadow .3s;
+  position: relative;
+}
+.pstep-icon::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 10px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,160,64,.18) 0%, transparent 70%);
+  opacity: 0; transition: opacity .3s;
+}
+.pstep:hover .pstep-icon {
+  border-color: rgba(201,160,64,.5);
+  background: linear-gradient(135deg, rgba(201,160,64,.14) 0%, rgba(201,160,64,.04) 100%);
+  box-shadow: 0 0 20px rgba(201,160,64,.12), inset 0 1px 0 rgba(201,160,64,.15);
+}
+.pstep:hover .pstep-icon::after { opacity: 1; }
+.pstep-icon svg {
+  width: 22px; height: 22px;
+  stroke: var(--gold); fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  position: relative; z-index: 1;
+  transition: transform .3s;
+}
+.pstep:hover .pstep-icon svg { transform: scale(1.12); }
+
+@keyframes iconPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,160,64,0); }
+  50%      { box-shadow: 0 0 22px 4px rgba(201,160,64,.14); }
+}
+.pstep:hover .pstep-icon { animation: iconPulse 1.8s ease infinite; }
 .pstep-title {
   font-family: var(--cond); font-size: .85rem; font-weight: 700;
   letter-spacing: .1em; text-transform: uppercase;
@@ -592,67 +1012,166 @@ nav.scrolled {
   font-family: var(--cond); font-weight: 700; font-size: .72rem;
   letter-spacing: .2em; text-transform: uppercase; color: var(--mid);
 }
-.ccl-socials { display: flex; flex-direction: column; gap: 1rem; }
+.ccl-socials { display: flex; flex-direction: column; gap: .8rem; }
 .ccl-s {
+  display: flex; align-items: center; gap: .75rem;
   font-family: var(--cond); font-size: .65rem; font-weight: 600;
   letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
-  border-bottom: 1px solid var(--line); padding-bottom: .4rem;
+  border-bottom: 1px solid var(--line); padding-bottom: .5rem;
   transition: color .2s, border-color .2s;
 }
+.ccl-s svg {
+  width: 14px; height: 14px; flex-shrink: 0;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform .25s;
+}
 .ccl-s:hover { color: var(--gold); border-color: rgba(201,160,64,.3); }
+.ccl-s:hover svg { transform: scale(1.15) rotate(-5deg); }
 
 .contact-col-main {
   padding: 6rem 5rem;
   display: flex; flex-direction: column; justify-content: center;
   position: relative; overflow: hidden;
 }
+/* animated conic sweep */
+.contact-col-main::before {
+  content: '';
+  position: absolute; inset: -50%; pointer-events: none; z-index: 0;
+  background: conic-gradient(from 210deg at 60% 50%,
+    rgba(201,160,64,.06) 0deg, transparent 60deg,
+    transparent 300deg, rgba(201,160,64,.03) 360deg);
+  animation: contactSpin 20s linear infinite;
+}
+@keyframes contactSpin { to { transform: rotate(360deg); } }
+.contact-col-main::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
 .contact-glow {
   position: absolute; top: 50%; left: 40%;
   transform: translate(-50%,-50%);
   width: 60vw; height: 60vh;
-  background: radial-gradient(ellipse, rgba(201,160,64,.05) 0%, transparent 65%);
-  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(201,160,64,.08) 0%, transparent 65%);
+  pointer-events: none; z-index: 1;
+  animation: glowBreathe 6s ease-in-out infinite;
+}
+@keyframes glowBreathe {
+  0%,100% { opacity:.7; transform:translate(-50%,-50%) scale(1); }
+  50%      { opacity:1;  transform:translate(-50%,-50%) scale(1.14); }
+}
+.contact-avail {
+  display: inline-flex; align-items: center; gap: .6rem;
+  margin-bottom: 2rem;
+  font-family: var(--cond); font-size: .65rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: #4ade80;
+  border: 1px solid rgba(74,222,128,.25);
+  padding: .45rem 1.1rem; border-radius: 50px;
+  background: rgba(74,222,128,.05);
+  position: relative; z-index: 2;
+}
+.contact-avail-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+  animation: pulse 2s infinite;
 }
 .contact-kicker {
   font-family: var(--cond); font-size: .68rem; font-weight: 700;
   letter-spacing: .2em; text-transform: uppercase; color: var(--gold);
   margin-bottom: 1.5rem; display: flex; align-items: center; gap: .8rem;
+  position: relative; z-index: 2;
 }
 .contact-kicker::before { content: ''; width: 24px; height: 1px; background: var(--gold); }
 .contact-headline {
   font-size: clamp(2.5rem, 6vw, 6.5rem); font-weight: 900;
   color: var(--white); letter-spacing: -.03em; line-height: .9;
   text-transform: uppercase; margin-bottom: 3rem;
+  position: relative; z-index: 2;
 }
-.contact-headline .ghost {
-  -webkit-text-stroke: 1px rgba(255,255,255,.14);
-  color: transparent;
-}
+.contact-headline .ghost { -webkit-text-stroke: 1px rgba(255,255,255,.14); color: transparent; }
 .contact-headline .gold { color: var(--gold); }
 .contact-email {
   font-size: clamp(1rem,2vw,1.4rem); font-weight: 600;
   color: var(--white); letter-spacing: -.01em;
   border-bottom: 1px solid rgba(201,160,64,.3);
-  padding-bottom: .4rem; display: inline-block;
-  transition: color .25s, border-color .25s;
+  padding-bottom: .4rem; display: inline-flex; align-items: center; gap: .5rem;
+  transition: color .25s, border-color .25s, gap .3s;
+  position: relative; z-index: 2;
 }
-.contact-email:hover { color: var(--gold); border-color: var(--gold); }
+.contact-email svg {
+  width: 18px; height: 18px; flex-shrink: 0;
+  stroke: var(--gold); fill: none; stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transform: translateX(-8px);
+  transition: opacity .3s, transform .3s;
+}
+.contact-email:hover { color: var(--gold); border-color: var(--gold); gap: 1rem; }
+.contact-email:hover svg { opacity: 1; transform: translateX(0); }
 .contact-note {
   font-family: var(--cond); font-size: .7rem; font-weight: 500;
   letter-spacing: .12em; text-transform: uppercase;
   color: var(--muted); margin-top: 2rem;
+  position: relative; z-index: 2;
+}
+.contact-socials {
+  display: flex; gap: .7rem; margin-top: 2.5rem;
+  position: relative; z-index: 2;
+}
+.contact-soc {
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: 8px;
+  color: var(--muted);
+  transition: color .25s, border-color .25s, background .25s, transform .25s, box-shadow .25s;
+}
+.contact-soc svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.contact-soc:hover {
+  color: var(--gold); border-color: rgba(201,160,64,.4);
+  background: rgba(201,160,64,.07);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(201,160,64,.1);
 }
 
 /* ─── FOOTER ─── */
 footer {
-  margin-left: 56px; padding: 1.5rem 3rem;
+  margin-left: 56px; padding: 1.4rem 3rem;
   border-top: 1px solid var(--line);
   display: flex; justify-content: space-between; align-items: center;
+  position: relative; overflow: hidden;
+}
+footer::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(201,160,64,.03) 0%, transparent 40%);
 }
 .f-l, .f-r {
   font-family: var(--cond); font-size: .65rem; font-weight: 600;
   letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  position: relative;
 }
+.f-center {
+  display: flex; gap: .6rem; align-items: center;
+}
+.f-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--muted); opacity: .4;
+}
+.f-top {
+  display: flex; align-items: center; gap: .4rem;
+  font-family: var(--cond); font-size: .65rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line); padding: .35rem .85rem; border-radius: 3px;
+  transition: color .2s, border-color .2s, transform .2s;
+}
+.f-top:hover { color: var(--gold); border-color: rgba(201,160,64,.35); transform: translateY(-2px); }
 
 /* ─── ANIMATIONS ─── */
 @keyframes fadein { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -692,9 +1211,16 @@ footer {
 </head>
 <body>
 
+<!-- FLOATING ORBS -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
 <!-- LOADER -->
 <div id="loader">
+  <div class="ld-eyebrow">Portfolio 2025</div>
   <div class="ld-name" id="ld-name">Pinindu <span>C.</span></div>
+  <div class="ld-tagline">UX Designer · Sri Lanka</div>
   <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
   <div class="ld-pct" id="ld-pct">0%</div>
 </div>
@@ -710,9 +1236,15 @@ footer {
 <div id="sidebar">
   <div class="sb-logo">PC</div>
   <div class="sb-socials">
-    <a href="https://www.linkedin.com/in/pininduchethiya001" class="sb-s" target="_blank">Li</a>
-    <a href="https://github.com/Pinindu" class="sb-s" target="_blank">Gh</a>
-    <a href="https://www.behance.net/MCEYE_Graphics" class="sb-s" target="_blank">Be</a>
+    <a href="https://www.linkedin.com/in/pininduchethiya001" class="sb-s" target="_blank" data-label="LinkedIn">
+      <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    </a>
+    <a href="https://github.com/Pinindu" class="sb-s" target="_blank" data-label="GitHub">
+      <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+    </a>
+    <a href="https://www.behance.net/MCEYE_Graphics" class="sb-s" target="_blank" data-label="Behance">
+      <svg viewBox="0 0 24 24"><path d="M8 11c1.657 0 3-1.343 3-3S9.657 5 8 5H3v14h5.5c1.933 0 3.5-1.567 3.5-3.5S10.433 11 8.5 11H8z" stroke-width="1.6"/><line x1="14" y1="7" x2="20" y2="7"/><path d="M14 12h6M14 17c0 0 1 2 3 2s3-2 3-2" stroke-width="1.6"/></svg>
+    </a>
   </div>
   <div class="sb-num" id="sb-scroll">00</div>
 </div>
@@ -724,15 +1256,20 @@ footer {
     <li><a href="#about">About</a></li>
     <li><a href="#experience">Experience</a></li>
     <li><a href="#work">Work</a></li>
+    <li><a href="#behance">Behance</a></li>
     <li><a href="#process">Process</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <a href="mailto:Pinindu97@gmail.com" class="nav-cta">Hire Me</a>
+  <a href="mailto:pinindu@example.com" class="nav-cta">
+    Hire Me
+    <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+  </a>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
   <div class="hero-bg"><div class="hero-bg-grid"></div><div class="hero-bg-glow"></div></div>
+  <canvas id="hero-canvas"></canvas>
 
   <div class="hero-left">
     <div>
@@ -773,31 +1310,63 @@ footer {
 
 <!-- TICKER -->
 <div class="ticker-bar">
-  <div class="ticker-track">
-    <div class="ticker-item"><span class="dot">●</span> UX Research</div>
-    <div class="ticker-item"><span class="dot">●</span> Wireframing</div>
-    <div class="ticker-item"><span class="dot">●</span> Prototyping</div>
-    <div class="ticker-item"><span class="dot">●</span> Figma</div>
-    <div class="ticker-item"><span class="dot">●</span> Adobe XD</div>
-    <div class="ticker-item"><span class="dot">●</span> Visual Design</div>
-    <div class="ticker-item"><span class="dot">●</span> Maze</div>
-    <div class="ticker-item"><span class="dot">●</span> Design Systems</div>
-    <div class="ticker-item"><span class="dot">●</span> Usability Testing</div>
-    <div class="ticker-item"><span class="dot">●</span> Conversational AI</div>
-    <div class="ticker-item"><span class="dot">●</span> Agile / Scrum</div>
-    <div class="ticker-item"><span class="dot">●</span> User Psychology</div>
-    <div class="ticker-item"><span class="dot">●</span> UX Research</div>
-    <div class="ticker-item"><span class="dot">●</span> Wireframing</div>
-    <div class="ticker-item"><span class="dot">●</span> Prototyping</div>
-    <div class="ticker-item"><span class="dot">●</span> Figma</div>
-    <div class="ticker-item"><span class="dot">●</span> Adobe XD</div>
-    <div class="ticker-item"><span class="dot">●</span> Visual Design</div>
-    <div class="ticker-item"><span class="dot">●</span> Maze</div>
-    <div class="ticker-item"><span class="dot">●</span> Design Systems</div>
-    <div class="ticker-item"><span class="dot">●</span> Usability Testing</div>
-    <div class="ticker-item"><span class="dot">●</span> Conversational AI</div>
-    <div class="ticker-item"><span class="dot">●</span> Agile / Scrum</div>
-    <div class="ticker-item"><span class="dot">●</span> User Psychology</div>
+  <div class="ticker-row">
+    <div class="ticker-track">
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> UX Research</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Wireframing</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Prototyping</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Figma</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Adobe XD</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Visual Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Design Systems</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Usability Testing</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Conversational AI</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Agile / Scrum</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> User Psychology</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Maze</div>
+      <!-- duplicate for loop -->
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> UX Research</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Wireframing</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Prototyping</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Figma</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Adobe XD</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Visual Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Design Systems</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Usability Testing</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Conversational AI</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Agile / Scrum</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> User Psychology</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Maze</div>
+    </div>
+  </div>
+  <div class="ticker-row">
+    <div class="ticker-track">
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Human-Centered Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Journey Mapping</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Interaction Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Information Architecture</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Miro</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Accessibility</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Persona Development</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Design Thinking</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> A/B Testing</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Typography</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Motion Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Color Theory</div>
+      <!-- duplicate -->
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Human-Centered Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Journey Mapping</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Interaction Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Information Architecture</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Miro</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Accessibility</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Persona Development</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Design Thinking</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> A/B Testing</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Typography</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Motion Design</div>
+      <div class="ticker-item"><svg class="tick-div" viewBox="0 0 8 8"><polygon points="4,0 8,4 4,8 0,4"/></svg> Color Theory</div>
+    </div>
   </div>
 </div>
 
@@ -830,18 +1399,22 @@ footer {
     </div>
     <div class="about-stats">
       <div class="astat reveal">
+        <svg class="astat-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
         <div class="astat-num"><span id="n1">0</span><sup>+</sup></div>
         <div class="astat-label">Years Experience</div>
       </div>
       <div class="astat reveal">
+        <svg class="astat-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <div class="astat-num"><span id="n2">0</span><sup>+</sup></div>
         <div class="astat-label">Companies Worked With</div>
       </div>
       <div class="astat reveal">
+        <svg class="astat-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
         <div class="astat-num"><span id="n3">0</span><sup>+</sup></div>
         <div class="astat-label">Case Studies Published</div>
       </div>
       <div class="astat reveal">
+        <svg class="astat-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
         <div class="astat-num">BSc</div>
         <div class="astat-label">Computer Science · SUSL</div>
       </div>
@@ -864,48 +1437,60 @@ footer {
       <div class="exp-row">
         <div class="exp-n">01</div>
         <div>
-          <div class="exp-role">User Experience Designer</div>
-          <div class="exp-co">Aventude <span class="exp-loc">· Colombo, Sri Lanka</span></div>
+          <div class="exp-role">User Experience Designer
+            <svg class="exp-role-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="exp-co"><svg class="exp-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Aventude <span class="exp-loc">· Colombo, Sri Lanka</span></div>
         </div>
         <div class="exp-r"><div class="exp-period">Mar 2024 — Present</div><span class="exp-badge">Current</span></div>
       </div>
       <div class="exp-row">
         <div class="exp-n">02</div>
         <div>
-          <div class="exp-role">UI/UX Designer</div>
-          <div class="exp-co">Codimite <span class="exp-loc">· Boralesgamuwa, Sri Lanka</span></div>
+          <div class="exp-role">UI/UX Designer
+            <svg class="exp-role-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="exp-co"><svg class="exp-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Codimite <span class="exp-loc">· Boralesgamuwa, Sri Lanka</span></div>
         </div>
         <div class="exp-r"><div class="exp-period">Mar 2023 — Sep 2023</div></div>
       </div>
       <div class="exp-row">
         <div class="exp-n">03</div>
         <div>
-          <div class="exp-role">UX Designer</div>
-          <div class="exp-co">Dialog Axiata PLC <span class="exp-loc">· Colombo, Sri Lanka</span></div>
+          <div class="exp-role">UX Designer
+            <svg class="exp-role-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="exp-co"><svg class="exp-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Dialog Axiata PLC <span class="exp-loc">· Colombo, Sri Lanka</span></div>
         </div>
         <div class="exp-r"><div class="exp-period">Aug 2022 — Mar 2023</div></div>
       </div>
       <div class="exp-row">
         <div class="exp-n">04</div>
         <div>
-          <div class="exp-role">UI/UX Designer</div>
-          <div class="exp-co">Cheplan <span class="exp-loc">· Milano, Italy</span></div>
+          <div class="exp-role">UI/UX Designer
+            <svg class="exp-role-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="exp-co"><svg class="exp-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Cheplan <span class="exp-loc">· Milano, Italy</span></div>
         </div>
         <div class="exp-r"><div class="exp-period">Apr 2022 — Jul 2022</div></div>
       </div>
       <div class="exp-row">
         <div class="exp-n">05</div>
         <div>
-          <div class="exp-role">UI/UX Designer</div>
-          <div class="exp-co">My Fitformula Technologies <span class="exp-loc">· Atlanta, USA</span></div>
+          <div class="exp-role">UI/UX Designer
+            <svg class="exp-role-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="exp-co"><svg class="exp-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>My Fitformula Technologies <span class="exp-loc">· Atlanta, USA</span></div>
         </div>
         <div class="exp-r"><div class="exp-period">Dec 2020 — Jun 2022</div></div>
       </div>
       <div class="exp-row">
         <div class="exp-n">06</div>
         <div>
-          <div class="exp-role">UI &amp; Graphic Designer</div>
-          <div class="exp-co">McEye Graphics <span class="exp-loc">· Sri Lanka</span></div>
+          <div class="exp-role">UI &amp; Graphic Designer
+            <svg class="exp-role-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="exp-co"><svg class="exp-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>McEye Graphics <span class="exp-loc">· Sri Lanka</span></div>
         </div>
         <div class="exp-r"><div class="exp-period">2016 — Present</div></div>
       </div>
@@ -930,11 +1515,11 @@ footer {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/241408027/UX-Case-Study-using-AI-tools-RentLK" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/772249241408027.69577dd47aef6.png" alt="RentLK" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'>🏠</div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/772249241408027.69577dd47aef6.png" alt="RentLK" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/><line x1=\'3\' y1=\'9\' x2=\'21\' y2=\'9\'/><line x1=\'9\' y1=\'21\' x2=\'9\' y2=\'9\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
-          <div class="wcard-meta"><span class="wcard-tag">AI-Assisted UX · 2026</span><span class="wcard-arrow">↗</span></div>
+          <div class="wcard-meta"><span class="wcard-tag">AI-Assisted UX · 2026</span><span class="wcard-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></span></div>
           <div class="wcard-title">RentLK — AI Tools UX Case Study</div>
           <div class="wcard-desc">End-to-end UX for a Sri Lankan hardware rental platform using AI throughout the design workflow.</div>
         </div>
@@ -944,11 +1529,11 @@ footer {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/207895733/UX-Case-Study-Farming-Support-Mobile-App-(Sri-Lanka)" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/912e1b207895733.66e5502a6efff.png" alt="Farming" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'>🌾</div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/912e1b207895733.66e5502a6efff.png" alt="Farming" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><rect x=\'5\' y=\'2\' width=\'14\' height=\'20\' rx=\'2\'/><line x1=\'12\' y1=\'18\' x2=\'12.01\' y2=\'18\'/><line x1=\'9\' y1=\'7\' x2=\'15\' y2=\'7\'/><line x1=\'9\' y1=\'11\' x2=\'15\' y2=\'11\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
-          <div class="wcard-meta"><span class="wcard-tag">Mobile App · 2024</span><span class="wcard-arrow">↗</span></div>
+          <div class="wcard-meta"><span class="wcard-tag">Mobile App · 2024</span><span class="wcard-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></span></div>
           <div class="wcard-title">Farming Support App — Sri Lanka</div>
           <div class="wcard-desc">Empowering Sri Lankan farmers with agricultural guidance and market access.</div>
         </div>
@@ -958,11 +1543,11 @@ footer {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/190116223/Bus-Tracking-Mobile-App-UX-Case-Study" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e75e73190116223.65c5b0e05e54b.png" alt="Bus Tracking" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'>🚌</div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e75e73190116223.65c5b0e05e54b.png" alt="Bus Tracking" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><polygon points=\'3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21\'/><line x1=\'9\' y1=\'3\' x2=\'9\' y2=\'18\'/><line x1=\'15\' y1=\'6\' x2=\'15\' y2=\'21\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
-          <div class="wcard-meta"><span class="wcard-tag">Mobile App · 2024</span><span class="wcard-arrow">↗</span></div>
+          <div class="wcard-meta"><span class="wcard-tag">Mobile App · 2024</span><span class="wcard-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></span></div>
           <div class="wcard-title">Bus Tracking App — UX Case Study</div>
           <div class="wcard-desc">Solving public transport pain points through research-led real-time tracking design.</div>
         </div>
@@ -972,11 +1557,11 @@ footer {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/180647133/WhatsApp-Channels-Redesign" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1b5085180647133.6519e1ef7c5fb.png" alt="WhatsApp" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'>💬</div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1b5085180647133.6519e1ef7c5fb.png" alt="WhatsApp" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><path d=\'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\'/><line x1=\'9\' y1=\'10\' x2=\'15\' y2=\'10\'/><line x1=\'9\' y1=\'14\' x2=\'12\' y2=\'14\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
-          <div class="wcard-meta"><span class="wcard-tag">Redesign Concept · 2023</span><span class="wcard-arrow">↗</span></div>
+          <div class="wcard-meta"><span class="wcard-tag">Redesign Concept · 2023</span><span class="wcard-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></span></div>
           <div class="wcard-title">WhatsApp Channels Redesign</div>
           <div class="wcard-desc">Reimagining content discovery and subscription UX within the WhatsApp ecosystem.</div>
         </div>
@@ -986,11 +1571,11 @@ footer {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/182336959/Web-Design-Football-Club-Official-Website-Conceptual" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/3f5e1f182336959.652afe86aced2.png" alt="Football" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'>⚽</div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/3f5e1f182336959.652afe86aced2.png" alt="Football" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><polygon points=\'12,2 2,7 12,12 22,7\'/><polyline points=\'2,17 12,22 22,17\'/><polyline points=\'2,12 12,17 22,12\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
-          <div class="wcard-meta"><span class="wcard-tag">Web Design · 2023</span><span class="wcard-arrow">↗</span></div>
+          <div class="wcard-meta"><span class="wcard-tag">Web Design · 2023</span><span class="wcard-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></span></div>
           <div class="wcard-title">Football Club Official Website</div>
           <div class="wcard-desc">Balancing club brand identity with a fan-first dynamic digital experience.</div>
         </div>
@@ -1000,17 +1585,79 @@ footer {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/168068021/GPA-Cal-kalkuljator-srednego-balla" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d85e52168068021.6437fa9c2b5e6.png" alt="GPA" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'>🎓</div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d85e52168068021.6437fa9c2b5e6.png" alt="GPA" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
-          <div class="wcard-meta"><span class="wcard-tag">App Design · 2023</span><span class="wcard-arrow">↗</span></div>
+          <div class="wcard-meta"><span class="wcard-tag">App Design · 2023</span><span class="wcard-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></span></div>
           <div class="wcard-title">GPA Calculator App</div>
           <div class="wcard-desc">Clean, minimal mobile UI for university students — clarity above all.</div>
         </div>
       </a>
     </div>
 
+  </div>
+</section>
+
+<!-- BEHANCE CTA -->
+<section id="behance">
+  <div class="behance-layout">
+    <div class="behance-col-left">
+      <div>
+        <div class="bcl-num">04<span style="font-size:1.2rem;vertical-align:super;color:var(--gold);">b</span></div>
+        <div class="bcl-title">Behance</div>
+      </div>
+    </div>
+    <div class="behance-main">
+      <div class="behance-watermark">B</div>
+      <div class="behance-inner">
+        <div class="behance-kicker">Case Studies · Full Archive</div>
+        <h2 class="behance-headline">
+          All my work<br>
+          lives <span class="gold">here</span><br>
+          <span class="ghost">on Behance.</span>
+        </h2>
+        <p class="behance-sub">
+          From <strong>UX case studies</strong> to graphic design experiments — every project I've poured hours into is documented and published. Research, wireframes, high-fidelity prototypes, and the thinking behind every decision.
+        </p>
+        <div class="behance-pills">
+          <span class="behance-pill"><span class="bpill-dot"></span> UX Case Studies</span>
+          <span class="behance-pill"><span class="bpill-dot"></span> UI Design</span>
+          <span class="behance-pill"><span class="bpill-dot"></span> Graphic Design</span>
+          <span class="behance-pill"><span class="bpill-dot"></span> Brand Identity</span>
+        </div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;">
+          <a href="https://www.behance.net/MCEYE_Graphics" target="_blank" class="behance-cta">
+            Explore All Case Studies <span class="behance-cta-arrow">↗</span>
+          </a>
+          <a href="https://www.behance.net/MCEYE_Graphics" target="_blank" class="behance-ghost">
+            @MCEYE_Graphics →
+          </a>
+        </div>
+      </div>
+      <div class="behance-strip">
+        <div class="behance-thumb">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/772249241408027.69577dd47aef6.png" alt="RentLK" loading="lazy" onerror="this.style.display='none'">
+          <div class="behance-thumb-label">RentLK</div>
+        </div>
+        <div class="behance-thumb">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/912e1b207895733.66e5502a6efff.png" alt="Farming" loading="lazy" onerror="this.style.display='none'">
+          <div class="behance-thumb-label">Farming App</div>
+        </div>
+        <div class="behance-thumb">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e75e73190116223.65c5b0e05e54b.png" alt="Bus" loading="lazy" onerror="this.style.display='none'">
+          <div class="behance-thumb-label">Bus Tracking</div>
+        </div>
+        <div class="behance-thumb">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1b5085180647133.6519e1ef7c5fb.png" alt="WhatsApp" loading="lazy" onerror="this.style.display='none'">
+          <div class="behance-thumb-label">WhatsApp</div>
+        </div>
+        <div class="behance-thumb">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d85e52168068021.6437fa9c2b5e6.png" alt="GPA" loading="lazy" onerror="this.style.display='none'">
+          <div class="behance-thumb-label">GPA Calc</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1026,25 +1673,33 @@ footer {
       <div class="process-steps">
         <div class="pstep reveal">
           <div class="pstep-n">01</div>
-          <div class="pstep-icon">🔍</div>
+          <div class="pstep-icon">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
           <div class="pstep-title">Discover</div>
           <div class="pstep-desc">User interviews, competitive analysis, and contextual research. Understanding the real problem before touching any screen.</div>
         </div>
         <div class="pstep reveal">
           <div class="pstep-n">02</div>
-          <div class="pstep-icon">💡</div>
+          <div class="pstep-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+          </div>
           <div class="pstep-title">Define</div>
           <div class="pstep-desc">Personas, journey maps, and clear problem statements that guide every decision — turning raw data into design direction.</div>
         </div>
         <div class="pstep reveal">
           <div class="pstep-n">03</div>
-          <div class="pstep-icon">✏️</div>
+          <div class="pstep-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+          </div>
           <div class="pstep-title">Design</div>
           <div class="pstep-desc">Rapid wireframing to high-fidelity prototypes. Iterating fast, validating often, always tethered to user needs.</div>
         </div>
         <div class="pstep reveal">
           <div class="pstep-n">04</div>
-          <div class="pstep-icon">🧪</div>
+          <div class="pstep-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 3H15"/><path d="M10 3v6l-4.39 7.612A2 2 0 0 0 7.35 20h9.3a2 2 0 0 0 1.74-2.988L14 9V3"/><line x1="6.8" y1="15" x2="17.2" y2="15"/></svg>
+          </div>
           <div class="pstep-title">Test & Iterate</div>
           <div class="pstep-desc">Usability testing with real users, data-driven iteration, and polish until the experience feels completely effortless.</div>
         </div>
@@ -1062,22 +1717,54 @@ footer {
         <div class="ccl-title">Contact</div>
       </div>
       <div class="ccl-socials">
-        <a href="mailto:Pinindu97@gmail.com" class="ccl-s">Email</a>
-        <a href="https://www.linkedin.com/in/pininduchethiya001" class="ccl-s" target="_blank">LinkedIn</a>
-        <a href="https://github.com/Pinindu" class="ccl-s" target="_blank">GitHub</a>
-        <a href="https://www.behance.net/MCEYE_Graphics" class="ccl-s" target="_blank">Behance</a>
+        <a href="mailto:pinindu@example.com" class="ccl-s">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+        <a href="https://www.linkedin.com/in/pininduchethiya001" class="ccl-s" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+        <a href="https://github.com/Pinindu" class="ccl-s" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
+        </a>
+        <a href="https://www.behance.net/MCEYE_Graphics" class="ccl-s" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M8 11c1.657 0 3-1.343 3-3S9.657 5 8 5H3v14h5.5c1.933 0 3.5-1.567 3.5-3.5S10.433 11 8.5 11H8z"/><line x1="14" y1="7" x2="20" y2="7"/><path d="M14 12h6M14 17c0 0 1 2 3 2s3-2 3-2"/></svg>
+          Behance
+        </a>
       </div>
     </div>
     <div class="contact-col-main">
       <div class="contact-glow"></div>
+      <div class="contact-avail reveal">
+        <span class="contact-avail-dot"></span> Available for new projects
+      </div>
       <div class="contact-kicker reveal">Let's work together</div>
       <h2 class="contact-headline reveal">
         Got a<br>
         <span class="gold">project</span><br>
         <span class="ghost">in mind?</span>
       </h2>
-      <a href="mailto:Pinindu97@gmail.com" class="contact-email reveal">Pinindu97@gmail.com</a>
+      <a href="mailto:pinindu@example.com" class="contact-email reveal">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+        pinindu@example.com
+      </a>
       <p class="contact-note reveal">Based in Sri Lanka · Available worldwide · Open to full-time &amp; freelance</p>
+      <div class="contact-socials reveal">
+        <a href="https://www.linkedin.com/in/pininduchethiya001" class="contact-soc" target="_blank" title="LinkedIn">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="https://github.com/Pinindu" class="contact-soc" target="_blank" title="GitHub">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        </a>
+        <a href="https://www.behance.net/MCEYE_Graphics" class="contact-soc" target="_blank" title="Behance">
+          <svg viewBox="0 0 24 24"><path d="M8 11c1.657 0 3-1.343 3-3S9.657 5 8 5H3v14h5.5c1.933 0 3.5-1.567 3.5-3.5S10.433 11 8.5 11H8z"/><line x1="14" y1="7" x2="20" y2="7"/><path d="M14 12h6M14 17c0 0 1 2 3 2s3-2 3-2"/></svg>
+        </a>
+        <a href="mailto:pinindu@example.com" class="contact-soc" title="Email">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -1085,10 +1772,20 @@ footer {
 <!-- FOOTER -->
 <footer>
   <span class="f-l">© 2025 Pinindu Chethiya</span>
-  <span class="f-r">UX Designer · Colombo, Sri Lanka</span>
+  <div class="f-center">
+    <span class="f-dot"></span>
+    <span class="f-r">UX Designer</span>
+    <span class="f-dot"></span>
+    <span class="f-r">Colombo, Sri Lanka</span>
+    <span class="f-dot"></span>
+  </div>
+  <a href="#hero" class="f-top" title="Back to top">
+    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5,12 12,5 19,12"/></svg>
+    Top
+  </a>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* LOADER */
 window.addEventListener('load', () => {
   const fill = document.getElementById('ld-fill');
@@ -1174,16 +1871,163 @@ hs.addEventListener('mousemove', e => {
 });
 
 /* ACTIVE NAV on scroll */
-const sections = ['about','experience','work','process','contact'];
+const sections = ['about','experience','work','behance','process','contact'];
 window.addEventListener('scroll', () => {
-  let cur = '';
+  const scrollY = window.scrollY + window.innerHeight * 0.4;
   sections.forEach(id => {
     const el = document.getElementById(id);
-    if(el && window.scrollY >= el.offsetTop - 120) cur = id;
+    if(!el) return;
+    const top = el.offsetTop;
+    const bottom = top + el.offsetHeight;
+    const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+    if(link) link.classList.toggle('active', scrollY >= top && scrollY < bottom);
   });
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    a.classList.toggle('active', a.getAttribute('href') === '#'+cur);
-  });
+});
+
+/* HERO PARTICLE CANVAS */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const hero = document.getElementById('hero');
+
+  let W = 0, H = 0;
+
+  function resize() {
+    W = canvas.width  = hero.offsetWidth;
+    H = canvas.height = hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* ── particles ── */
+  const TOTAL = 90;
+  const pts = [];
+
+  for (let i = 0; i < TOTAL; i++) {
+    const big = i < 14;
+    pts.push({
+      x:    Math.random() * 1400,
+      y:    Math.random() * 900,
+      r:    big ? (Math.random() * 3 + 2.5) : (Math.random() * 1.4 + 0.5),
+      vx:   (Math.random() - 0.5) * (big ? 0.18 : 0.4),
+      vy:   (Math.random() - 0.5) * (big ? 0.18 : 0.4),
+      a:    Math.random() * 0.5 + 0.3,
+      da:   (Math.random() > 0.5 ? 1 : -1) * 0.004,
+      aMin: big ? 0.25 : 0.12,
+      aMax: big ? 0.85 : 0.7,
+      big:  big,
+    });
+  }
+
+  /* ── shooting stars ── */
+  const stars = [];
+  function addStar() {
+    stars.push({
+      x:  Math.random() * W * 0.7,
+      y:  Math.random() * H * 0.5,
+      dx: 3.5 + Math.random() * 3,
+      dy: 1.5 + Math.random() * 2,
+      len: 80 + Math.random() * 100,
+      life: 1.0,
+    });
+  }
+  addStar();
+  setInterval(addStar, 2600);
+
+  function tick() {
+    if (!W || !H) { requestAnimationFrame(tick); return; }
+    ctx.clearRect(0, 0, W, H);
+
+    /* particles */
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.a += p.da;
+      if (p.a < p.aMin || p.a > p.aMax) p.da *= -1;
+      if (p.x < -5)  p.x = W + 5;
+      if (p.x > W+5) p.x = -5;
+      if (p.y < -5)  p.y = H + 5;
+      if (p.y > H+5) p.y = -5;
+
+      /* glow halo for big dots */
+      if (p.big) {
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+        g.addColorStop(0,   `rgba(201,160,64,${(p.a * 0.5).toFixed(2)})`);
+        g.addColorStop(0.5, `rgba(201,160,64,${(p.a * 0.12).toFixed(2)})`);
+        g.addColorStop(1,   `rgba(201,160,64,0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      }
+
+      /* core dot */
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,160,64,${p.a.toFixed(2)})`;
+      ctx.fill();
+    }
+
+    /* connection lines */
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const dx = pts[i].x - pts[j].x;
+        const dy = pts[i].y - pts[j].y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 150) {
+          const alpha = (1 - d / 150) * 0.3;
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x, pts[i].y);
+          ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = `rgba(201,160,64,${alpha.toFixed(2)})`;
+          ctx.lineWidth = (1 - d / 150) * 1.1;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* shooting stars */
+    for (let i = stars.length - 1; i >= 0; i--) {
+      const s = stars[i];
+      const ex = s.x + s.dx * s.len / (s.dx + s.dy);
+      const ey = s.y + s.dy * s.len / (s.dx + s.dy);
+      const g = ctx.createLinearGradient(s.x, s.y, ex, ey);
+      g.addColorStop(0,   `rgba(201,160,64,0)`);
+      g.addColorStop(0.5, `rgba(201,160,64,${(s.life * 0.45).toFixed(2)})`);
+      g.addColorStop(1,   `rgba(240,210,130,${s.life.toFixed(2)})`);
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(ex, ey);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      s.x += s.dx;
+      s.y += s.dy;
+      s.life -= 0.016;
+      if (s.life <= 0 || s.x > W + 50 || s.y > H + 50) stars.splice(i, 1);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+})();
+
+/* BEHANCE SECTION REVEAL */
+document.querySelectorAll('.behance-inner,.behance-strip').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(28px)';
+  el.style.transition = 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1)';
+  const obs = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting) {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      obs.unobserve(el);
+    }
+  }, {threshold: .08});
+  obs.observe(el);
 });
 </script>
 </body>
