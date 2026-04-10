@@ -57,10 +57,14 @@ img { display: block; }
   position: fixed; inset: 0; background: #0a0a0a; z-index: 10000;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 0;
-  transition: opacity .9s ease, visibility .9s;
   overflow: hidden;
+  animation: loaderDismiss 0.7s ease 1.8s forwards;
 }
-#loader.out { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes loaderDismiss {
+  0%   { opacity: 1; visibility: visible; pointer-events: auto; }
+  99%  { opacity: 0; visibility: visible; pointer-events: none; }
+  100% { opacity: 0; visibility: hidden;  pointer-events: none; display: none; }
+}
 /* loader grid bg */
 #loader::before {
   content: '';
@@ -69,10 +73,7 @@ img { display: block; }
     linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
   background-size: 72px 72px;
-  animation: loaderGrid 1.2s ease forwards;
-  opacity: 0;
 }
-@keyframes loaderGrid { to { opacity: 1; } }
 /* loader glow */
 #loader::after {
   content: '';
@@ -81,18 +82,12 @@ img { display: block; }
   width: 600px; height: 300px;
   background: radial-gradient(ellipse, rgba(201,160,64,.08) 0%, transparent 70%);
   pointer-events: none;
-  animation: loaderGlow 2s ease-in-out infinite;
-}
-@keyframes loaderGlow {
-  0%,100% { opacity: .5; transform: translate(-50%,-50%) scale(1); }
-  50%      { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
 }
 .ld-eyebrow {
   font-family: var(--cond); font-size: .6rem; font-weight: 700;
   letter-spacing: .35em; text-transform: uppercase;
   color: var(--gold); margin-bottom: 1.8rem;
   display: flex; align-items: center; gap: .8rem;
-  opacity: 0; animation: fadein .5s ease .1s forwards;
   position: relative; z-index: 1;
 }
 .ld-eyebrow::before, .ld-eyebrow::after {
@@ -103,14 +98,12 @@ img { display: block; }
   font-size: clamp(2.5rem,6vw,5.5rem); letter-spacing: .12em;
   text-transform: uppercase; color: var(--white);
   position: relative; z-index: 1;
-  opacity: 0; animation: fadein .7s cubic-bezier(.16,1,.3,1) .2s forwards;
 }
 .ld-name span { color: var(--gold); }
 .ld-tagline {
   font-family: var(--cond); font-size: .72rem; font-weight: 400;
   letter-spacing: .22em; text-transform: uppercase; color: var(--mid);
   margin-top: .7rem; margin-bottom: 2.5rem;
-  opacity: 0; animation: fadein .5s ease .5s forwards;
   position: relative; z-index: 1;
 }
 .ld-track {
@@ -120,13 +113,21 @@ img { display: block; }
 .ld-fill {
   position: absolute; left: 0; top: 0; height: 100%;
   background: linear-gradient(90deg, var(--gold), #e8d090);
-  width: 0; transition: width .08s linear;
   box-shadow: 0 0 12px rgba(201,160,64,.6);
+  animation: ldBar 1.6s cubic-bezier(.4,0,.2,1) 0.1s forwards;
+  width: 0;
 }
+@keyframes ldBar { to { width: 100%; } }
 .ld-pct {
   font-family: var(--cond); font-size: .7rem; letter-spacing: .22em;
   color: var(--muted); text-transform: uppercase;
   margin-top: 1rem; position: relative; z-index: 1;
+  animation: ldPct 1.6s steps(20, end) 0.1s forwards;
+}
+@keyframes ldPct {
+  0%  { content: ''; } 5% { } 10% { } 15% { } 20% { } 25% { } 30% { }
+  35%{ } 40%{ } 45%{ } 50%{ } 55%{ } 60%{ } 65%{ } 70%{ } 75%{ } 80%{ }
+  85%{ } 90%{ } 95%{ } 100%{ }
 }
 
 /* ─── SIDEBAR (left vertical strip like Aer) ─── */
@@ -297,21 +298,26 @@ nav.scrolled {
 /* hero bg */
 .hero-bg {
   position: absolute; inset: 0;
-  background: linear-gradient(105deg, #111 0%, #1c1c1c 50%, #0e0e0e 100%);
+  background: linear-gradient(125deg, #0f0f0f 0%, #141414 45%, #0e0e0e 100%);
   z-index: 0;
 }
 .hero-bg-grid {
   position: absolute; inset: 0; z-index: 1;
   background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 .hero-bg-glow {
-  position: absolute; top: 20%; right: 20%; z-index: 1;
-  width: 50vw; height: 50vw;
-  background: radial-gradient(ellipse, rgba(201,160,64,.06) 0%, transparent 65%);
-  pointer-events: none;
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 60% at 78% 35%, rgba(201,160,64,.07) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 15% 70%, rgba(201,160,64,.04) 0%, transparent 60%);
+  animation: heroBgPulse 8s ease-in-out infinite;
+}
+@keyframes heroBgPulse {
+  0%,100% { opacity: .7; }
+  50%      { opacity: 1; }
 }
 #hero-canvas {
   position: absolute; inset: 0; z-index: 2;
@@ -495,34 +501,6 @@ nav.scrolled {
   50%      { transform: translateY(-18px) rotate(-1deg); }
 }
 
-/* preview strip of small case study thumbnails */
-.behance-strip {
-  display: flex; gap: 0; overflow: hidden;
-  border-top: 1px solid var(--line); margin-top: auto;
-}
-.behance-thumb {
-  flex: 1; height: 160px; overflow: hidden; position: relative;
-  border-right: 1px solid var(--line);
-}
-.behance-thumb:last-child { border-right: none; }
-.behance-thumb img {
-  width: 100%; height: 100%; object-fit: cover;
-  filter: brightness(.55) saturate(.5) contrast(1.1);
-  transition: filter .5s, transform .5s;
-}
-.behance-thumb:hover img {
-  filter: brightness(.9) saturate(1) contrast(1);
-  transform: scale(1.06);
-}
-.behance-thumb-label {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: .6rem .8rem;
-  font-family: var(--cond); font-size: .58rem; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase;
-  color: var(--gold); background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
-  opacity: 0; transform: translateY(4px); transition: all .3s;
-}
-.behance-thumb:hover .behance-thumb-label { opacity: 1; transform: translateY(0); }
 
 @media(max-width:960px) {
   #behance { margin-left: 0; }
@@ -531,7 +509,6 @@ nav.scrolled {
   .behance-inner { padding: 3rem 1.5rem; }
   .behance-headline { font-size: clamp(2rem,10vw,3.5rem); }
   .behance-watermark { font-size: 10rem; }
-  .behance-strip { display: none; }
   .behance-ghost { display: none; }
 }
 
@@ -735,7 +712,6 @@ nav.scrolled {
   display: grid; grid-template-columns: 2.5rem 1fr auto;
   gap: 0 2rem; align-items: start;
   padding: 2rem 0; border-bottom: 1px solid var(--line);
-  opacity: 0; transform: translateX(-16px);
   transition: opacity .55s, transform .55s;
   position: relative; cursor: default;
 }
@@ -836,7 +812,6 @@ nav.scrolled {
   flex: 0 0 380px; scroll-snap-align: start;
   border-right: 1px solid var(--line);
   overflow: hidden; position: relative;
-  opacity: 0; transform: translateY(20px);
   transition: opacity .6s, transform .6s;
 }
 .wcard.in { opacity: 1; transform: translateY(0); }
@@ -858,12 +833,11 @@ nav.scrolled {
 .wcard-img-fallback {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #0e0e0e 0%, #161616 100%);
+  position: relative; overflow: hidden;
 }
-.wcard-img-fallback svg {
-  width: 40px; height: 40px;
-  stroke: rgba(201,160,64,.35); fill: none;
-  stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round;
+.wcard-img-fallback svg.thumb-scene {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
 }
 .wcard-overlay {
   position: absolute; inset: 0;
@@ -1173,10 +1147,49 @@ footer::before {
 }
 .f-top:hover { color: var(--gold); border-color: rgba(201,160,64,.35); transform: translateY(-2px); }
 
-/* ─── ANIMATIONS ─── */
+/* ─── SCROLL REVEAL — CSS entrance, no JS dependency ─── */
 @keyframes fadein { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+}
 .reveal.in { opacity: 1; transform: translateY(0); }
+
+/* Fallback: if JS never fires .in, show everything after 1s */
+@keyframes revealFallback {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  animation: revealFallback 0.7s cubic-bezier(.16,1,.3,1) 1.2s both;
+}
+.reveal.in {
+  animation: none;
+  opacity: 1; transform: translateY(0);
+}
+
+.exp-row {
+  opacity: 0; transform: translateX(-16px);
+  transition: opacity .55s, transform .55s;
+  animation: expRowFallback .55s ease 1.3s both;
+}
+@keyframes expRowFallback {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.exp-row.in { animation: none; opacity: 1; transform: translateX(0); }
+
+.wcard {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .6s, transform .6s;
+  animation: wcardFallback .6s ease 1.4s both;
+}
+@keyframes wcardFallback {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.wcard.in { animation: none; opacity: 1; transform: translateY(0); }
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:960px) {
@@ -1218,11 +1231,10 @@ footer::before {
 
 <!-- LOADER -->
 <div id="loader">
-  <div class="ld-eyebrow">Portfolio 2025</div>
-  <div class="ld-name" id="ld-name">Pinindu <span>C.</span></div>
+  <div class="ld-eyebrow">Portfolio</div>
+  <div class="ld-name">Pinindu <span>C.</span></div>
   <div class="ld-tagline">UX Designer · Sri Lanka</div>
-  <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
-  <div class="ld-pct" id="ld-pct">0%</div>
+  <div class="ld-track"><div class="ld-fill"></div></div>
 </div>
 
 <!-- CURSOR -->
@@ -1285,7 +1297,7 @@ footer::before {
   </div>
 
   <div class="hero-right">
-    <div class="hero-kicker">UX Designer · Sri Lanka · 4+ Years</div>
+    <div class="hero-kicker">UX Designer · Sri Lanka · 5+ Years</div>
     <h1 class="hero-headline">
       Design<br>
       <span class="gold">Human</span><br>
@@ -1515,7 +1527,7 @@ footer::before {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/241408027/UX-Case-Study-using-AI-tools-RentLK" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/772249241408027.69577dd47aef6.png" alt="RentLK" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\'/><line x1=\'3\' y1=\'9\' x2=\'21\' y2=\'9\'/><line x1=\'9\' y1=\'21\' x2=\'9\' y2=\'9\'/></svg></div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/772249241408027.69577dd47aef6.png" alt="RentLK" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg class=\'thumb-scene\' viewBox=\'0 0 380 260\' xmlns=\'http://www.w3.org/2000/svg\'><defs><linearGradient id=\'bg1\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#0a0a0a\'/><stop offset=\'100%\' stop-color=\'#131820\'/></linearGradient><linearGradient id=\'gl1\' x1=\'0\' y1=\'0\' x2=\'0\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#c9a040\' stop-opacity=\'0.18\'/><stop offset=\'100%\' stop-color=\'#c9a040\' stop-opacity=\'0\'/></linearGradient></defs><rect width=\'380\' height=\'260\' fill=\'url(#bg1)\'/><line x1=\'0\' y1=\'40\' x2=\'380\' y2=\'40\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'80\' x2=\'380\' y2=\'80\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'120\' x2=\'380\' y2=\'120\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'160\' x2=\'380\' y2=\'160\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'200\' x2=\'380\' y2=\'200\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'60\' y1=\'0\' x2=\'60\' y2=\'260\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'120\' y1=\'0\' x2=\'120\' y2=\'260\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'180\' y1=\'0\' x2=\'180\' y2=\'260\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'240\' y1=\'0\' x2=\'240\' y2=\'260\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><line x1=\'300\' y1=\'0\' x2=\'300\' y2=\'260\' stroke=\'rgba(255,255,255,0.04)\' stroke-width=\'1\'/><ellipse cx=\'250\' cy=\'100\' rx=\'120\' ry=\'80\' fill=\'rgba(201,160,64,0.06)\'/><rect x=\'100\' y=\'70\' width=\'70\' height=\'90\' rx=\'4\' fill=\'#1a1a1a\' stroke=\'rgba(201,160,64,0.5)\' stroke-width=\'1.5\'/><polygon points=\'100,70 135,45 170,70\' fill=\'#141414\' stroke=\'rgba(201,160,64,0.5)\' stroke-width=\'1.5\'/><rect x=\'118\' y=\'115\' width=\'16\' height=\'22\' rx=\'2\' fill=\'rgba(201,160,64,0.25)\' stroke=\'rgba(201,160,64,0.5)\' stroke-width=\'1\'/><rect x=\'146\' y=\'115\' width=\'16\' height=\'22\' rx=\'2\' fill=\'rgba(201,160,64,0.25)\' stroke=\'rgba(201,160,64,0.5)\' stroke-width=\'1\'/><rect x=\'113\' y=\'85\' width=\'10\' height=\'10\' rx=\'1\' fill=\'rgba(201,160,64,0.2)\' stroke=\'rgba(201,160,64,0.4)\' stroke-width=\'1\'/><rect x=\'148\' y=\'85\' width=\'10\' height=\'10\' rx=\'1\' fill=\'rgba(201,160,64,0.2)\' stroke=\'rgba(201,160,64,0.4)\' stroke-width=\'1\'/><rect x=\'130\' y=\'85\' width=\'10\' height=\'10\' rx=\'1\' fill=\'rgba(201,160,64,0.2)\' stroke=\'rgba(201,160,64,0.4)\' stroke-width=\'1\'/><rect x=\'195\' y=\'90\' width=\'80\' height=\'20\' rx=\'3\' fill=\'rgba(201,160,64,0.08)\' stroke=\'rgba(201,160,64,0.3)\' stroke-width=\'1\'/><rect x=\'195\' y=\'118\' width=\'60\' height=\'8\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><rect x=\'195\' y=\'132\' width=\'75\' height=\'8\' rx=\'2\' fill=\'rgba(255,255,255,0.04)\'/><rect x=\'195\' y=\'146\' width=\'50\' height=\'8\' rx=\'2\' fill=\'rgba(255,255,255,0.04)\'/><circle cx=\'205\' cy=\'100\' r=\'4\' fill=\'rgba(201,160,64,0.6)\'/><text x=\'215\' y=\'104\' font-family=\'monospace\' font-size=\'8\' fill=\'rgba(201,160,64,0.7)\'>AI-Powered</text><line x1=\'175\' y1=\'155\' x2=\'190\' y2=\'105\' stroke=\'rgba(201,160,64,0.3)\' stroke-width=\'1\' stroke-dasharray=\'3,3\'/><text x=\'20\' y=\'240\' font-family=\'sans-serif\' font-weight=\'700\' font-size=\'13\' fill=\'rgba(255,255,255,0.7)\' letter-spacing=\'2\'>RENTLK</text><text x=\'20\' y=\'254\' font-family=\'sans-serif\' font-size=\'9\' fill=\'rgba(201,160,64,0.6)\' letter-spacing=\'1\'>UX CASE STUDY</text><line x1=\'0\' y1=\'225\' x2=\'380\' y2=\'225\' stroke=\'rgba(201,160,64,0.15)\' stroke-width=\'1\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
@@ -1529,7 +1541,7 @@ footer::before {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/207895733/UX-Case-Study-Farming-Support-Mobile-App-(Sri-Lanka)" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/912e1b207895733.66e5502a6efff.png" alt="Farming" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><rect x=\'5\' y=\'2\' width=\'14\' height=\'20\' rx=\'2\'/><line x1=\'12\' y1=\'18\' x2=\'12.01\' y2=\'18\'/><line x1=\'9\' y1=\'7\' x2=\'15\' y2=\'7\'/><line x1=\'9\' y1=\'11\' x2=\'15\' y2=\'11\'/></svg></div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/912e1b207895733.66e5502a6efff.png" alt="Farming" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg class=\'thumb-scene\' viewBox=\'0 0 380 260\' xmlns=\'http://www.w3.org/2000/svg\'><defs><linearGradient id=\'bg2\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#080e0a\'/><stop offset=\'100%\' stop-color=\'#111a11\'/></linearGradient></defs><rect width=\'380\' height=\'260\' fill=\'url(#bg2)\'/><line x1=\'0\' y1=\'52\' x2=\'380\' y2=\'52\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'104\' x2=\'380\' y2=\'104\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'156\' x2=\'380\' y2=\'156\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'208\' x2=\'380\' y2=\'208\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'76\' y1=\'0\' x2=\'76\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'152\' y1=\'0\' x2=\'152\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'228\' y1=\'0\' x2=\'228\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'304\' y1=\'0\' x2=\'304\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><ellipse cx=\'190\' cy=\'110\' rx=\'140\' ry=\'90\' fill=\'rgba(100,180,80,0.04)\'/><rect x=\'130\' y=\'50\' width=\'72\' height=\'130\' rx=\'10\' fill=\'#0f1a0f\' stroke=\'rgba(201,160,64,0.45)\' stroke-width=\'1.5\'/><rect x=\'135\' y=\'60\' width=\'62\' height=\'90\' rx=\'5\' fill=\'#0a130a\'/><rect x=\'138\' y=\'63\' width=\'56\' height=\'16\' rx=\'2\' fill=\'rgba(100,180,80,0.15)\' stroke=\'rgba(100,180,80,0.3)\' stroke-width=\'0.8\'/><rect x=\'138\' y=\'83\' width=\'56\' height=\'6\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><rect x=\'138\' y=\'93\' width=\'40\' height=\'5\' rx=\'2\' fill=\'rgba(255,255,255,0.04)\'/><rect x=\'138\' y=\'102\' width=\'50\' height=\'5\' rx=\'2\' fill=\'rgba(255,255,255,0.04)\'/><path d=\'M138 120 Q148 108 158 115 Q168 122 178 112 Q183 108 188 110\' fill=\'none\' stroke=\'rgba(100,200,80,0.6)\' stroke-width=\'1.5\'/><circle cx=\'154\' cy=\'175\' r=\'3\' fill=\'rgba(201,160,64,0.6)\'/><path d=\'M220 130 Q230 100 245 90 Q255 83 260 95 Q265 108 255 118 Q245 128 235 122 Q225 116 220 130Z\' fill=\'rgba(80,160,60,0.15)\' stroke=\'rgba(80,160,60,0.4)\' stroke-width=\'1.2\'/><line x1=\'240\' y1=\'90\' x2=\'240\' y2=\'160\' stroke=\'rgba(80,160,60,0.25)\' stroke-width=\'1\' stroke-dasharray=\'2,3\'/><circle cx=\'285\' cy=\'85\' r=\'16\' fill=\'none\' stroke=\'rgba(201,160,64,0.25)\' stroke-width=\'1\' stroke-dasharray=\'3,3\'/><circle cx=\'285\' cy=\'85\' r=\'6\' fill=\'rgba(201,160,64,0.4)\'/><text x=\'20\' y=\'240\' font-family=\'sans-serif\' font-weight=\'700\' font-size=\'13\' fill=\'rgba(255,255,255,0.7)\' letter-spacing=\'2\'>FARMING APP</text><text x=\'20\' y=\'254\' font-family=\'sans-serif\' font-size=\'9\' fill=\'rgba(201,160,64,0.6)\' letter-spacing=\'1\'>UX CASE STUDY · SRI LANKA</text><line x1=\'0\' y1=\'225\' x2=\'380\' y2=\'225\' stroke=\'rgba(201,160,64,0.15)\' stroke-width=\'1\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
@@ -1543,7 +1555,7 @@ footer::before {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/190116223/Bus-Tracking-Mobile-App-UX-Case-Study" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e75e73190116223.65c5b0e05e54b.png" alt="Bus Tracking" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><polygon points=\'3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21\'/><line x1=\'9\' y1=\'3\' x2=\'9\' y2=\'18\'/><line x1=\'15\' y1=\'6\' x2=\'15\' y2=\'21\'/></svg></div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e75e73190116223.65c5b0e05e54b.png" alt="Bus Tracking" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg class=\'thumb-scene\' viewBox=\'0 0 380 260\' xmlns=\'http://www.w3.org/2000/svg\'><defs><linearGradient id=\'bg3\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#090c12\'/><stop offset=\'100%\' stop-color=\'#0e1520\'/></linearGradient></defs><rect width=\'380\' height=\'260\' fill=\'url(#bg3)\'/><line x1=\'0\' y1=\'50\' x2=\'380\' y2=\'50\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'100\' x2=\'380\' y2=\'100\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'150\' x2=\'380\' y2=\'150\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'200\' x2=\'380\' y2=\'200\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'75\' y1=\'0\' x2=\'75\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'150\' y1=\'0\' x2=\'150\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'225\' y1=\'0\' x2=\'225\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'300\' y1=\'0\' x2=\'300\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><path d=\'M60 180 Q100 140 150 130 Q200 120 240 90 Q270 68 300 75\' fill=\'none\' stroke=\'rgba(201,160,64,0.2)\' stroke-width=\'2\' stroke-dasharray=\'5,5\'/><path d=\'M60 180 Q100 140 150 130 Q200 120 240 90 Q270 68 300 75\' fill=\'none\' stroke=\'rgba(201,160,64,0.5)\' stroke-width=\'1.5\'/><circle cx=\'60\' cy=\'180\' r=\'5\' fill=\'rgba(201,160,64,0.3)\' stroke=\'rgba(201,160,64,0.8)\' stroke-width=\'1.5\'/><circle cx=\'150\' cy=\'130\' r=\'5\' fill=\'rgba(201,160,64,0.3)\' stroke=\'rgba(201,160,64,0.8)\' stroke-width=\'1.5\'/><circle cx=\'240\' cy=\'90\' r=\'5\' fill=\'rgba(201,160,64,0.3)\' stroke=\'rgba(201,160,64,0.8)\' stroke-width=\'1.5\'/><circle cx=\'300\' cy=\'75\' r=\'7\' fill=\'rgba(201,160,64,0.5)\' stroke=\'rgba(201,160,64,1)\' stroke-width=\'1.5\'/><path d=\'M300 56 Q300 48 294 44 Q288 40 282 44 Q276 48 276 56 Q276 68 300 82 Q324 68 324 56 Q324 48 318 44 Q312 40 306 44 Q300 48 300 56Z\' fill=\'rgba(201,160,64,0.6)\' stroke=\'rgba(201,160,64,0.9)\' stroke-width=\'1\'/><rect x=\'240\' y=\'50\' width=\'85\' height=\'38\' rx=\'4\' fill=\'rgba(14,21,32,0.9)\' stroke=\'rgba(201,160,64,0.3)\' stroke-width=\'1\'/><text x=\'248\' y=\'64\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(201,160,64,0.8)\'>LIVE TRACKING</text><text x=\'248\' y=\'76\' font-family=\'monospace\' font-size=\'8\' fill=\'rgba(255,255,255,0.7)\' font-weight=\'bold\'>BUS 138</text><text x=\'248\' y=\'85\' font-family=\'monospace\' font-size=\'6\' fill=\'rgba(100,200,100,0.8)\'>● 2 min away</text><rect x=\'40\' y=\'155\' width=\'55\' height=\'18\' rx=\'3\' fill=\'rgba(14,21,32,0.85)\' stroke=\'rgba(201,160,64,0.2)\' stroke-width=\'1\'/><text x=\'48\' y=\'167\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(255,255,255,0.5)\'>Pettah</text><ellipse cx=\'190\' cy=\'130\' rx=\'160\' ry=\'80\' fill=\'rgba(60,100,200,0.03)\'/><text x=\'20\' y=\'240\' font-family=\'sans-serif\' font-weight=\'700\' font-size=\'13\' fill=\'rgba(255,255,255,0.7)\' letter-spacing=\'2\'>BUS TRACKING</text><text x=\'20\' y=\'254\' font-family=\'sans-serif\' font-size=\'9\' fill=\'rgba(201,160,64,0.6)\' letter-spacing=\'1\'>MOBILE APP · UX CASE STUDY</text><line x1=\'0\' y1=\'225\' x2=\'380\' y2=\'225\' stroke=\'rgba(201,160,64,0.15)\' stroke-width=\'1\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
@@ -1557,7 +1569,7 @@ footer::before {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/180647133/WhatsApp-Channels-Redesign" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1b5085180647133.6519e1ef7c5fb.png" alt="WhatsApp" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><path d=\'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\'/><line x1=\'9\' y1=\'10\' x2=\'15\' y2=\'10\'/><line x1=\'9\' y1=\'14\' x2=\'12\' y2=\'14\'/></svg></div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1b5085180647133.6519e1ef7c5fb.png" alt="WhatsApp" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg class=\'thumb-scene\' viewBox=\'0 0 380 260\' xmlns=\'http://www.w3.org/2000/svg\'><defs><linearGradient id=\'bg4\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#090d0a\'/><stop offset=\'100%\' stop-color=\'#0f1612\'/></linearGradient></defs><rect width=\'380\' height=\'260\' fill=\'url(#bg4)\'/><line x1=\'0\' y1=\'50\' x2=\'380\' y2=\'50\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'100\' x2=\'380\' y2=\'100\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'150\' x2=\'380\' y2=\'150\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'200\' x2=\'380\' y2=\'200\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'76\' y1=\'0\' x2=\'76\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'152\' y1=\'0\' x2=\'152\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'228\' y1=\'0\' x2=\'228\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'304\' y1=\'0\' x2=\'304\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><ellipse cx=\'200\' cy=\'110\' rx=\'130\' ry=\'75\' fill=\'rgba(37,211,102,0.04)\'/><rect x=\'110\' y=\'40\' width=\'100\' height=\'155\' rx=\'12\' fill=\'#0d1510\' stroke=\'rgba(37,211,102,0.35)\' stroke-width=\'1.5\'/><rect x=\'115\' y=\'50\' width=\'90\' height=\'14\' rx=\'3\' fill=\'rgba(37,211,102,0.12)\' stroke=\'rgba(37,211,102,0.25)\' stroke-width=\'0.8\'/><text x=\'120\' y=\'61\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(255,255,255,0.6)\'>Channels</text><rect x=\'115\' y=\'70\' width=\'90\' height=\'22\' rx=\'3\' fill=\'rgba(255,255,255,0.04)\'/><circle cx=\'126\' cy=\'81\' r=\'7\' fill=\'rgba(201,160,64,0.25)\' stroke=\'rgba(201,160,64,0.5)\' stroke-width=\'1\'/><rect x=\'137\' y=\'76\' width=\'40\' height=\'4\' rx=\'1\' fill=\'rgba(255,255,255,0.15)\'/><rect x=\'137\' y=\'83\' width=\'28\' height=\'3\' rx=\'1\' fill=\'rgba(255,255,255,0.07)\'/><rect x=\'115\' y=\'96\' width=\'90\' height=\'22\' rx=\'3\' fill=\'rgba(255,255,255,0.04)\'/><circle cx=\'126\' cy=\'107\' r=\'7\' fill=\'rgba(80,140,255,0.2)\' stroke=\'rgba(80,140,255,0.4)\' stroke-width=\'1\'/><rect x=\'137\' y=\'102\' width=\'50\' height=\'4\' rx=\'1\' fill=\'rgba(255,255,255,0.15)\'/><rect x=\'137\' y=\'109\' width=\'35\' height=\'3\' rx=\'1\' fill=\'rgba(255,255,255,0.07)\'/><rect x=\'115\' y=\'122\' width=\'90\' height=\'22\' rx=\'3\' fill=\'rgba(201,160,64,0.06)\' stroke=\'rgba(201,160,64,0.2)\' stroke-width=\'0.8\'/><circle cx=\'126\' cy=\'133\' r=\'7\' fill=\'rgba(201,160,64,0.3)\' stroke=\'rgba(201,160,64,0.6)\' stroke-width=\'1\'/><rect x=\'137\' y=\'128\' width=\'45\' height=\'4\' rx=\'1\' fill=\'rgba(201,160,64,0.35)\'/><rect x=\'137\' y=\'135\' width=\'30\' height=\'3\' rx=\'1\' fill=\'rgba(255,255,255,0.07)\'/><circle cx=\'160\' cy=\'183\' r=\'4\' fill=\'rgba(201,160,64,0.5)\'/><rect x=\'230\' y=\'65\' width=\'90\' height=\'90\' rx=\'6\' fill=\'rgba(13,21,16,0.8)\' stroke=\'rgba(37,211,102,0.2)\' stroke-width=\'1\'/><text x=\'238\' y=\'82\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(37,211,102,0.7)\'>REDESIGN</text><rect x=\'238\' y=\'88\' width=\'50\' height=\'5\' rx=\'2\' fill=\'rgba(255,255,255,0.08)\'/><rect x=\'238\' y=\'97\' width=\'65\' height=\'5\' rx=\'2\' fill=\'rgba(255,255,255,0.05)\'/><rect x=\'238\' y=\'106\' width=\'45\' height=\'5\' rx=\'2\' fill=\'rgba(255,255,255,0.05)\'/><polyline points=\'238,125 248,118 260,122 272,114 284,117 296,110 308,113\' fill=\'none\' stroke=\'rgba(201,160,64,0.6)\' stroke-width=\'1.5\'/><text x=\'20\' y=\'240\' font-family=\'sans-serif\' font-weight=\'700\' font-size=\'13\' fill=\'rgba(255,255,255,0.7)\' letter-spacing=\'2\'>WHATSAPP</text><text x=\'20\' y=\'254\' font-family=\'sans-serif\' font-size=\'9\' fill=\'rgba(201,160,64,0.6)\' letter-spacing=\'1\'>CHANNELS REDESIGN CONCEPT</text><line x1=\'0\' y1=\'225\' x2=\'380\' y2=\'225\' stroke=\'rgba(201,160,64,0.15)\' stroke-width=\'1\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
@@ -1571,7 +1583,7 @@ footer::before {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/182336959/Web-Design-Football-Club-Official-Website-Conceptual" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/3f5e1f182336959.652afe86aced2.png" alt="Football" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><polygon points=\'12,2 2,7 12,12 22,7\'/><polyline points=\'2,17 12,22 22,17\'/><polyline points=\'2,12 12,17 22,12\'/></svg></div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/3f5e1f182336959.652afe86aced2.png" alt="Football" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg class=\'thumb-scene\' viewBox=\'0 0 380 260\' xmlns=\'http://www.w3.org/2000/svg\'><defs><linearGradient id=\'bg5\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#0a0a0e\'/><stop offset=\'100%\' stop-color=\'#12121c\'/></linearGradient></defs><rect width=\'380\' height=\'260\' fill=\'url(#bg5)\'/><line x1=\'0\' y1=\'50\' x2=\'380\' y2=\'50\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'100\' x2=\'380\' y2=\'100\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'150\' x2=\'380\' y2=\'150\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'200\' x2=\'380\' y2=\'200\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'76\' y1=\'0\' x2=\'76\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'152\' y1=\'0\' x2=\'152\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'228\' y1=\'0\' x2=\'228\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'304\' y1=\'0\' x2=\'304\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><ellipse cx=\'190\' cy=\'115\' rx=\'150\' ry=\'90\' fill=\'rgba(201,160,64,0.04)\'/><rect x=\'50\' y=\'60\' width=\'280\' height=\'130\' rx=\'4\' fill=\'#0e0e14\' stroke=\'rgba(201,160,64,0.3)\' stroke-width=\'1\'/><rect x=\'50\' y=\'60\' width=\'280\' height=\'28\' rx=\'4\' fill=\'rgba(201,160,64,0.08)\' stroke=\'none\'/><rect x=\'55\' y=\'65\' width=\'18\' height=\'18\' rx=\'9\' fill=\'rgba(201,160,64,0.3)\' stroke=\'rgba(201,160,64,0.6)\' stroke-width=\'1\'/><text x=\'80\' y=\'78\' font-family=\'monospace\' font-size=\'8\' fill=\'rgba(255,255,255,0.6)\' font-weight=\'bold\'>FC OFFICIAL WEBSITE</text><rect x=\'58\' y=\'95\' width=\'110\' height=\'70\' rx=\'3\' fill=\'rgba(201,160,64,0.06)\' stroke=\'rgba(201,160,64,0.2)\' stroke-width=\'0.8\'/><rect x=\'62\' y=\'99\' width=\'102\' height=\'35\' rx=\'2\' fill=\'rgba(201,160,64,0.08)\'/><ellipse cx=\'113\' cy=\'117\' rx=\'22\' ry=\'14\' fill=\'none\' stroke=\'rgba(255,255,255,0.12)\' stroke-width=\'0.8\'/><line x1=\'113\' y1=\'103\' x2=\'113\' y2=\'131\' stroke=\'rgba(255,255,255,0.1)\' stroke-width=\'0.6\'/><line x1=\'91\' y1=\'117\' x2=\'135\' y2=\'117\' stroke=\'rgba(255,255,255,0.1)\' stroke-width=\'0.6\'/><rect x=\'62\' y=\'138\' width=\'50\' height=\'5\' rx=\'2\' fill=\'rgba(255,255,255,0.12)\'/><rect x=\'62\' y=\'147\' width=\'75\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.07)\'/><rect x=\'62\' y=\'155\' width=\'60\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.07)\'/><rect x=\'176\' y=\'95\' width=\'55\' height=\'70\' rx=\'3\' fill=\'rgba(255,255,255,0.03)\' stroke=\'rgba(255,255,255,0.08)\' stroke-width=\'0.8\'/><rect x=\'180\' y=\'99\' width=\'47\' height=\'25\' rx=\'2\' fill=\'rgba(201,160,64,0.06)\'/><rect x=\'180\' y=\'128\' width=\'47\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.1)\'/><rect x=\'180\' y=\'136\' width=\'35\' height=\'3\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><rect x=\'180\' y=\'143\' width=\'40\' height=\'3\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><rect x=\'240\' y=\'95\' width=\'85\' height=\'70\' rx=\'3\' fill=\'rgba(255,255,255,0.03)\' stroke=\'rgba(255,255,255,0.08)\' stroke-width=\'0.8\'/><rect x=\'244\' y=\'99\' width=\'77\' height=\'20\' rx=\'2\' fill=\'rgba(201,160,64,0.05)\'/><rect x=\'244\' y=\'123\' width=\'77\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.08)\'/><rect x=\'244\' y=\'131\' width=\'55\' height=\'3\' rx=\'2\' fill=\'rgba(255,255,255,0.05)\'/><rect x=\'244\' y=\'139\' width=\'65\' height=\'3\' rx=\'2\' fill=\'rgba(255,255,255,0.05)\'/><rect x=\'244\' y=\'147\' width=\'45\' height=\'3\' rx=\'2\' fill=\'rgba(255,255,255,0.05)\'/><text x=\'20\' y=\'240\' font-family=\'sans-serif\' font-weight=\'700\' font-size=\'13\' fill=\'rgba(255,255,255,0.7)\' letter-spacing=\'2\'>FOOTBALL CLUB</text><text x=\'20\' y=\'254\' font-family=\'sans-serif\' font-size=\'9\' fill=\'rgba(201,160,64,0.6)\' letter-spacing=\'1\'>OFFICIAL WEBSITE · WEB DESIGN</text><line x1=\'0\' y1=\'225\' x2=\'380\' y2=\'225\' stroke=\'rgba(201,160,64,0.15)\' stroke-width=\'1\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
@@ -1585,7 +1597,7 @@ footer::before {
     <div class="wcard">
       <a href="https://www.behance.net/gallery/168068021/GPA-Cal-kalkuljator-srednego-balla" target="_blank">
         <div class="wcard-img">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d85e52168068021.6437fa9c2b5e6.png" alt="GPA" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg viewBox=\'0 0 24 24\' stroke=\'rgba(201,160,64,.4)\' fill=\'none\' stroke-width=\'1.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' width=\'40\' height=\'40\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg></div>'">
+          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d85e52168068021.6437fa9c2b5e6.png" alt="GPA" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'wcard-img-fallback\'><svg class=\'thumb-scene\' viewBox=\'0 0 380 260\' xmlns=\'http://www.w3.org/2000/svg\'><defs><linearGradient id=\'bg6\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'><stop offset=\'0%\' stop-color=\'#0c0a0e\'/><stop offset=\'100%\' stop-color=\'#16121c\'/></linearGradient></defs><rect width=\'380\' height=\'260\' fill=\'url(#bg6)\'/><line x1=\'0\' y1=\'50\' x2=\'380\' y2=\'50\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'100\' x2=\'380\' y2=\'100\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'150\' x2=\'380\' y2=\'150\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'0\' y1=\'200\' x2=\'380\' y2=\'200\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'76\' y1=\'0\' x2=\'76\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'152\' y1=\'0\' x2=\'152\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'228\' y1=\'0\' x2=\'228\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><line x1=\'304\' y1=\'0\' x2=\'304\' y2=\'260\' stroke=\'rgba(255,255,255,0.03)\' stroke-width=\'1\'/><ellipse cx=\'200\' cy=\'110\' rx=\'120\' ry=\'80\' fill=\'rgba(150,100,220,0.05)\'/><rect x=\'120\' y=\'40\' width=\'105\' height=\'160\' rx=\'12\' fill=\'#0e0c14\' stroke=\'rgba(201,160,64,0.4)\' stroke-width=\'1.5\'/><rect x=\'125\' y=\'50\' width=\'95\' height=\'16\' rx=\'3\' fill=\'rgba(201,160,64,0.1)\' stroke=\'rgba(201,160,64,0.2)\' stroke-width=\'0.8\'/><text x=\'133\' y=\'62\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(201,160,64,0.8)\'>GPA CALCULATOR</text><rect x=\'128\' y=\'74\' width=\'89\' height=\'40\' rx=\'4\' fill=\'rgba(201,160,64,0.06)\' stroke=\'rgba(201,160,64,0.2)\' stroke-width=\'1\'/><text x=\'136\' y=\'92\' font-family=\'monospace\' font-size=\'20\' fill=\'rgba(255,255,255,0.85)\' font-weight=\'bold\'>3.87</text><text x=\'145\' y=\'108\' font-family=\'monospace\' font-size=\'6\' fill=\'rgba(201,160,64,0.6)\'>GPA · HONORS</text><rect x=\'128\' y=\'120\' width=\'89\' height=\'7\' rx=\'3\' fill=\'rgba(255,255,255,0.04)\'/><rect x=\'128\' y=\'120\' width=\'80\' height=\'7\' rx=\'3\' fill=\'rgba(201,160,64,0.3)\'/><rect x=\'128\' y=\'132\' width=\'89\' height=\'7\' rx=\'3\' fill=\'rgba(255,255,255,0.04)\'/><rect x=\'128\' y=\'132\' width=\'65\' height=\'7\' rx=\'3\' fill=\'rgba(150,100,220,0.3)\'/><rect x=\'128\' y=\'144\' width=\'89\' height=\'7\' rx=\'3\' fill=\'rgba(255,255,255,0.04)\'/><rect x=\'128\' y=\'144\' width=\'75\' height=\'7\' rx=\'3\' fill=\'rgba(80,160,80,0.3)\'/><rect x=\'128\' y=\'158\' width=\'89\' height=\'18\' rx=\'4\' fill=\'rgba(201,160,64,0.15)\' stroke=\'rgba(201,160,64,0.4)\' stroke-width=\'1\'/><text x=\'150\' y=\'171\' font-family=\'monospace\' font-size=\'8\' fill=\'rgba(201,160,64,0.9)\' font-weight=\'bold\'>Calculate</text><circle cx=\'172\' cy=\'189\' r=\'4\' fill=\'rgba(201,160,64,0.5)\'/><rect x=\'250\' y=\'70\' width=\'85\' height=\'110\' rx=\'6\' fill=\'rgba(14,12,20,0.8)\' stroke=\'rgba(150,100,220,0.25)\' stroke-width=\'1\'/><text x=\'258\' y=\'86\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(150,120,220,0.7)\'>SUBJECTS</text><rect x=\'258\' y=\'92\' width=\'69\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.08)\'/><rect x=\'258\' y=\'100\' width=\'55\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><rect x=\'258\' y=\'108\' width=\'63\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><rect x=\'258\' y=\'116\' width=\'48\' height=\'4\' rx=\'2\' fill=\'rgba(255,255,255,0.06)\'/><line x1=\'258\' y1=\'128\' x2=\'327\' y2=\'128\' stroke=\'rgba(255,255,255,0.06)\' stroke-width=\'0.8\'/><text x=\'258\' y=\'140\' font-family=\'monospace\' font-size=\'7\' fill=\'rgba(201,160,64,0.5)\'>Avg: 3.87</text><text x=\'20\' y=\'240\' font-family=\'sans-serif\' font-weight=\'700\' font-size=\'13\' fill=\'rgba(255,255,255,0.7)\' letter-spacing=\'2\'>GPA CALCULATOR</text><text x=\'20\' y=\'254\' font-family=\'sans-serif\' font-size=\'9\' fill=\'rgba(201,160,64,0.6)\' letter-spacing=\'1\'>APP DESIGN · 2023</text><line x1=\'0\' y1=\'225\' x2=\'380\' y2=\'225\' stroke=\'rgba(201,160,64,0.15)\' stroke-width=\'1\'/></svg></div>'">
           <div class="wcard-overlay"></div>
         </div>
         <div class="wcard-body">
@@ -1633,28 +1645,6 @@ footer::before {
           <a href="https://www.behance.net/MCEYE_Graphics" target="_blank" class="behance-ghost">
             @MCEYE_Graphics →
           </a>
-        </div>
-      </div>
-      <div class="behance-strip">
-        <div class="behance-thumb">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/772249241408027.69577dd47aef6.png" alt="RentLK" loading="lazy" onerror="this.style.display='none'">
-          <div class="behance-thumb-label">RentLK</div>
-        </div>
-        <div class="behance-thumb">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/912e1b207895733.66e5502a6efff.png" alt="Farming" loading="lazy" onerror="this.style.display='none'">
-          <div class="behance-thumb-label">Farming App</div>
-        </div>
-        <div class="behance-thumb">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/e75e73190116223.65c5b0e05e54b.png" alt="Bus" loading="lazy" onerror="this.style.display='none'">
-          <div class="behance-thumb-label">Bus Tracking</div>
-        </div>
-        <div class="behance-thumb">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/1b5085180647133.6519e1ef7c5fb.png" alt="WhatsApp" loading="lazy" onerror="this.style.display='none'">
-          <div class="behance-thumb-label">WhatsApp</div>
-        </div>
-        <div class="behance-thumb">
-          <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d85e52168068021.6437fa9c2b5e6.png" alt="GPA" loading="lazy" onerror="this.style.display='none'">
-          <div class="behance-thumb-label">GPA Calc</div>
         </div>
       </div>
     </div>
@@ -1746,7 +1736,7 @@ footer::before {
         <span class="gold">project</span><br>
         <span class="ghost">in mind?</span>
       </h2>
-      <a href="mailto:pinindu@example.com" class="contact-email reveal">
+      <a href="mailto:pinindu97@gmail.com" class="contact-email reveal">
         <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
         pinindu97@gmail.com
       </a>
@@ -1785,20 +1775,14 @@ footer::before {
   </a>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-/* LOADER */
-window.addEventListener('load', () => {
-  const fill = document.getElementById('ld-fill');
-  const pct  = document.getElementById('ld-pct');
-  const ldr  = document.getElementById('loader');
-  let p = 0;
-  const iv = setInterval(() => {
-    p = Math.min(p + Math.random() * 8 + 2, 100);
-    fill.style.width = p + '%';
-    pct.textContent = Math.floor(p) + '%';
-    if(p >= 100) { clearInterval(iv); setTimeout(() => ldr.classList.add('out'), 400); }
-  }, 40);
-});
+<script>
+/* LOADER — CSS handles dismiss, JS is just a safety net */
+setTimeout(function() {
+  var ldr = document.getElementById('loader');
+  if (ldr) {
+    ldr.style.cssText = 'display:none !important';
+  }
+}, 2600);
 
 /* CURSOR */
 const cur = document.getElementById('cur');
@@ -1857,7 +1841,7 @@ function countUp(id, target, suffix='') {
   }, {threshold:0.5});
   obs.observe(el);
 }
-countUp('n1',4); countUp('n2',10); countUp('n3',6);
+countUp('n1',5); countUp('n2',10); countUp('n3',6);
 
 /* DRAG SCROLL */
 const hs = document.getElementById('hscroll');
@@ -1884,14 +1868,16 @@ window.addEventListener('scroll', () => {
   });
 });
 
-/* HERO PARTICLE CANVAS */
+/* ═══════════════════════════════════════════
+   HERO CANVAS — Gold mesh · Aurora · Floaters
+═══════════════════════════════════════════ */
 (function() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
+  const ctx  = canvas.getContext('2d');
   const hero = document.getElementById('hero');
-
   let W = 0, H = 0;
+  let mouse = { x: -999, y: -999 };
 
   function resize() {
     W = canvas.width  = hero.offsetWidth;
@@ -1899,114 +1885,228 @@ window.addEventListener('scroll', () => {
   }
   resize();
   window.addEventListener('resize', resize);
+  hero.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  hero.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; });
 
-  /* ── particles ── */
-  const TOTAL = 90;
-  const pts = [];
+  /* ── GOLD MESH PARTICLES ── */
+  const MESH = 80;
+  const pts = Array.from({ length: MESH }, () => ({
+    x:  Math.random() * 1600,
+    y:  Math.random() * 900,
+    vx: (Math.random() - .5) * .38,
+    vy: (Math.random() - .5) * .38,
+    r:  Math.random() * 1.6 + .4,
+    a:  Math.random() * .55 + .18,
+    da: (Math.random() > .5 ? 1 : -1) * .004,
+    aMin: .1,
+    aMax: .7,
+    big: Math.random() > .82,
+  }));
 
-  for (let i = 0; i < TOTAL; i++) {
-    const big = i < 14;
-    pts.push({
-      x:    Math.random() * 1400,
-      y:    Math.random() * 900,
-      r:    big ? (Math.random() * 3 + 2.5) : (Math.random() * 1.4 + 0.5),
-      vx:   (Math.random() - 0.5) * (big ? 0.18 : 0.4),
-      vy:   (Math.random() - 0.5) * (big ? 0.18 : 0.4),
-      a:    Math.random() * 0.5 + 0.3,
-      da:   (Math.random() > 0.5 ? 1 : -1) * 0.004,
-      aMin: big ? 0.25 : 0.12,
-      aMax: big ? 0.85 : 0.7,
-      big:  big,
-    });
-  }
+  /* ── FLOATING ORB PARTICLES (larger, slower) ── */
+  const ORBS = 14;
+  const orbs = Array.from({ length: ORBS }, () => ({
+    x:   Math.random(),
+    y:   Math.random(),
+    r:   Math.random() * 3.5 + 2,
+    vx:  (Math.random() - .5) * .12,
+    vy:  (Math.random() - .5) * .10,
+    a:   Math.random() * .5 + .25,
+    da:  (Math.random() > .5 ? 1 : -1) * .003,
+    phase: Math.random() * Math.PI * 2,
+  }));
 
-  /* ── shooting stars ── */
-  const stars = [];
-  function addStar() {
-    stars.push({
-      x:  Math.random() * W * 0.7,
-      y:  Math.random() * H * 0.5,
-      dx: 3.5 + Math.random() * 3,
-      dy: 1.5 + Math.random() * 2,
-      len: 80 + Math.random() * 100,
+  /* ── AURORA WAVES ── */
+  const WAVES = 3;
+  const waves = Array.from({ length: WAVES }, (_, i) => ({
+    yBase: .25 + i * .22,
+    amplitude: .04 + Math.random() * .035,
+    frequency: .6 + Math.random() * .5,
+    speed: .0004 + Math.random() * .0003,
+    phase: Math.random() * Math.PI * 2,
+    alpha: .025 + i * .008,
+    color: i === 0 ? '201,160,64' : i === 1 ? '180,140,50' : '220,180,80',
+    thickness: 120 + i * 60,
+  }));
+
+  /* ── SHOOTING STREAKS ── */
+  const streaks = [];
+  function spawnStreak() {
+    streaks.push({
+      x:    Math.random() * W * .65,
+      y:    Math.random() * H * .45,
+      vx:   3.5 + Math.random() * 4,
+      vy:   1.5 + Math.random() * 2.5,
+      len:  90 + Math.random() * 120,
       life: 1.0,
+      fade: .013 + Math.random() * .009,
+      w:    .8 + Math.random() * .9,
     });
   }
-  addStar();
-  setInterval(addStar, 2600);
+  spawnStreak();
+  setInterval(() => { if (streaks.length < 3) spawnStreak(); }, 2600);
+
+  let t = 0;
 
   function tick() {
-    if (!W || !H) { requestAnimationFrame(tick); return; }
+    t += .016;
     ctx.clearRect(0, 0, W, H);
 
-    /* particles */
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.a += p.da;
-      if (p.a < p.aMin || p.a > p.aMax) p.da *= -1;
-      if (p.x < -5)  p.x = W + 5;
-      if (p.x > W+5) p.x = -5;
-      if (p.y < -5)  p.y = H + 5;
-      if (p.y > H+5) p.y = -5;
-
-      /* glow halo for big dots */
-      if (p.big) {
-        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
-        g.addColorStop(0,   `rgba(201,160,64,${(p.a * 0.5).toFixed(2)})`);
-        g.addColorStop(0.5, `rgba(201,160,64,${(p.a * 0.12).toFixed(2)})`);
-        g.addColorStop(1,   `rgba(201,160,64,0)`);
+    /* ── draw aurora waves ── */
+    waves.forEach(wv => {
+      wv.phase += wv.speed * 60;
+      ctx.save();
+      for (let pass = 0; pass < 2; pass++) {
+        const thick = wv.thickness * (pass === 0 ? 1 : .4);
+        const al    = wv.alpha    * (pass === 0 ? 1 : .5);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
-        ctx.fillStyle = g;
-        ctx.fill();
+        for (let xi = 0; xi <= W + 20; xi += 6) {
+          const yi = (wv.yBase + Math.sin(xi * wv.frequency * .006 + wv.phase) * wv.amplitude) * H;
+          xi === 0 ? ctx.moveTo(xi, yi) : ctx.lineTo(xi, yi);
+        }
+        ctx.lineWidth = thick;
+        const grad = ctx.createLinearGradient(0, 0, W, 0);
+        grad.addColorStop(0,   `rgba(${wv.color},0)`);
+        grad.addColorStop(.3,  `rgba(${wv.color},${al})`);
+        grad.addColorStop(.7,  `rgba(${wv.color},${al})`);
+        grad.addColorStop(1,   `rgba(${wv.color},0)`);
+        ctx.strokeStyle = grad;
+        ctx.filter = `blur(${pass === 0 ? 18 : 6}px)`;
+        ctx.stroke();
       }
+      ctx.restore();
+    });
 
-      /* core dot */
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(201,160,64,${p.a.toFixed(2)})`;
-      ctx.fill();
-    }
-
-    /* connection lines */
+    /* ── draw mesh connection lines ── */
     for (let i = 0; i < pts.length; i++) {
       for (let j = i + 1; j < pts.length; j++) {
         const dx = pts[i].x - pts[j].x;
         const dy = pts[i].y - pts[j].y;
         const d  = Math.sqrt(dx * dx + dy * dy);
-        if (d < 150) {
-          const alpha = (1 - d / 150) * 0.3;
+        if (d < 155) {
+          const alpha = (1 - d / 155) * .28;
           ctx.beginPath();
           ctx.moveTo(pts[i].x, pts[i].y);
           ctx.lineTo(pts[j].x, pts[j].y);
           ctx.strokeStyle = `rgba(201,160,64,${alpha.toFixed(2)})`;
-          ctx.lineWidth = (1 - d / 150) * 1.1;
+          ctx.lineWidth = (1 - d / 155) * 1.0;
           ctx.stroke();
         }
       }
     }
 
-    /* shooting stars */
-    for (let i = stars.length - 1; i >= 0; i--) {
-      const s = stars[i];
-      const ex = s.x + s.dx * s.len / (s.dx + s.dy);
-      const ey = s.y + s.dy * s.len / (s.dx + s.dy);
-      const g = ctx.createLinearGradient(s.x, s.y, ex, ey);
-      g.addColorStop(0,   `rgba(201,160,64,0)`);
-      g.addColorStop(0.5, `rgba(201,160,64,${(s.life * 0.45).toFixed(2)})`);
-      g.addColorStop(1,   `rgba(240,210,130,${s.life.toFixed(2)})`);
+    /* mouse connection lines — gold when near cursor */
+    pts.forEach(p => {
+      const dx = p.x - mouse.x;
+      const dy = p.y - mouse.y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < 130) {
+        const alpha = (1 - d / 130) * .55;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.strokeStyle = `rgba(201,160,64,${alpha.toFixed(2)})`;
+        ctx.lineWidth = (1 - d / 130) * 1.4;
+        ctx.stroke();
+      }
+    });
+
+    /* ── update + draw mesh dots ── */
+    pts.forEach(p => {
+      /* mouse repulsion */
+      const mdx = p.x - mouse.x, mdy = p.y - mouse.y;
+      const md  = Math.sqrt(mdx * mdx + mdy * mdy);
+      if (md < 110) {
+        const f = (110 - md) / 110 * .7;
+        p.vx += (mdx / md) * f;
+        p.vy += (mdy / md) * f;
+      }
+      p.vx *= .988; p.vy *= .988;
+      p.x += p.vx;  p.y += p.vy;
+      p.a += p.da;
+      if (p.a <= p.aMin || p.a >= p.aMax) p.da *= -1;
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10;
+      if (p.y > H + 10) p.y = -10;
+
+      /* big dot glow */
+      if (p.big) {
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 5.5);
+        g.addColorStop(0, `rgba(201,160,64,${(p.a * .45).toFixed(2)})`);
+        g.addColorStop(1, `rgba(201,160,64,0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,160,64,${p.a.toFixed(2)})`;
+      ctx.fill();
+    });
+
+    /* ── floating orb particles ── */
+    orbs.forEach(o => {
+      o.x += o.vx * .001;
+      o.y += o.vy * .001;
+      if (o.x < -.05) o.x = 1.05;
+      if (o.x > 1.05) o.x = -.05;
+      if (o.y < -.05) o.y = 1.05;
+      if (o.y > 1.05) o.y = -.05;
+      o.a += o.da;
+      if (o.a <= .12 || o.a >= .75) o.da *= -1;
+      o.phase += .018;
+      const px = o.x * W;
+      const py = o.y * H + Math.sin(o.phase) * 8;
+      /* halo */
+      const g = ctx.createRadialGradient(px, py, 0, px, py, o.r * 6);
+      g.addColorStop(0, `rgba(201,160,64,${(o.a * .35).toFixed(2)})`);
+      g.addColorStop(.5, `rgba(201,160,64,${(o.a * .08).toFixed(2)})`);
+      g.addColorStop(1, `rgba(201,160,64,0)`);
+      ctx.beginPath();
+      ctx.arc(px, py, o.r * 6, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+      /* core */
+      ctx.beginPath();
+      ctx.arc(px, py, o.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,180,80,${o.a.toFixed(2)})`;
+      ctx.fill();
+    });
+
+    /* ── shooting streaks ── */
+    for (let i = streaks.length - 1; i >= 0; i--) {
+      const s = streaks[i];
+      const total = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+      const ex = s.x + (s.vx / total) * s.len;
+      const ey = s.y + (s.vy / total) * s.len;
+      const sg = ctx.createLinearGradient(s.x, s.y, ex, ey);
+      sg.addColorStop(0, `rgba(201,160,64,0)`);
+      sg.addColorStop(.4, `rgba(201,160,64,${(s.life * .4).toFixed(2)})`);
+      sg.addColorStop(1, `rgba(240,210,120,${s.life.toFixed(2)})`);
       ctx.beginPath();
       ctx.moveTo(s.x, s.y);
       ctx.lineTo(ex, ey);
-      ctx.strokeStyle = g;
-      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = sg;
+      ctx.lineWidth = s.w;
       ctx.stroke();
-      s.x += s.dx;
-      s.y += s.dy;
-      s.life -= 0.016;
-      if (s.life <= 0 || s.x > W + 50 || s.y > H + 50) stars.splice(i, 1);
+      /* head glow */
+      const hg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 5);
+      hg.addColorStop(0, `rgba(255,220,130,${s.life.toFixed(2)})`);
+      hg.addColorStop(1, `rgba(201,160,64,0)`);
+      ctx.beginPath();
+      ctx.arc(ex, ey, 5, 0, Math.PI * 2);
+      ctx.fillStyle = hg;
+      ctx.fill();
+      s.x  += s.vx;
+      s.y  += s.vy;
+      s.life -= s.fade;
+      if (s.life <= 0 || s.x > W + 60 || s.y > H + 60) streaks.splice(i, 1);
     }
 
     requestAnimationFrame(tick);
@@ -2014,21 +2114,6 @@ window.addEventListener('scroll', () => {
 
   requestAnimationFrame(tick);
 })();
-
-/* BEHANCE SECTION REVEAL */
-document.querySelectorAll('.behance-inner,.behance-strip').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(28px)';
-  el.style.transition = 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1)';
-  const obs = new IntersectionObserver(entries => {
-    if(entries[0].isIntersecting) {
-      el.style.opacity = '1';
-      el.style.transform = 'none';
-      obs.unobserve(el);
-    }
-  }, {threshold: .08});
-  obs.observe(el);
-});
 </script>
 </body>
 </html>
